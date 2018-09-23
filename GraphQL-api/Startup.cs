@@ -10,6 +10,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
+using GraphQL;
+using GraphQL.Types;
+using GraphQL_api.Models;
+using GraphQL_api.Db;
+using GraphQL_api.Schema;
 
 namespace GraphQL_api
 {
@@ -28,6 +34,17 @@ namespace GraphQL_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddDbContext<NorthwindbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<OrderRepo>();
+            // services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            // services.AddSingleton<NorthwindQuery>();
+            // services.AddSingleton<NorthwindMutation>();
+            // services.AddSingleton<OrderType>();
+            // services.AddSingleton<OrderInputType>();
+
+            // var sp = services.BuildServiceProvider();
+            // services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,7 +59,7 @@ namespace GraphQL_api
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();Only for MVC
             app.UseGraphiQl();
             app.UseMvc();
         }

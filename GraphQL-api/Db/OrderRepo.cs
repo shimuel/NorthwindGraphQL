@@ -17,7 +17,9 @@ namespace GraphQL_api.Db
         }
         
         public async  Task<GraphQL_api.Models.Order> Get(int id){
-            return await _db.Orders.FirstOrDefaultAsync(p => p.OrderId == id);
+            return await _db.Orders
+            .Include(o => o.Customer).ThenInclude(c=>c.CustomerCustomerDemo)
+            .FirstOrDefaultAsync(p => p.OrderId == id);
         }
 
         public async Task<List<GraphQL_api.Models.Order>> All(){

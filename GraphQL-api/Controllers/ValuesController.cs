@@ -3,13 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-
+using GraphQL_api.Db;
 namespace GraphQL_api.Controllers
 {
+    
+    
+
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private  OrderRepo repo;
+
+        public ValuesController(OrderRepo repository)
+        {
+            repo = repository;
+        }
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
@@ -21,7 +31,18 @@ namespace GraphQL_api.Controllers
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)
         {
-            return "value";
+            string result = "";
+            try{
+
+            var o =  repo.Get(10643);
+
+            result = o.Result.Customer.ContactName;
+
+            }catch (Exception e){
+                result = e.Message;
+            }
+
+            return Content(result);
         }
 
         // POST api/values
