@@ -7,6 +7,7 @@ namespace GraphQL_api.Db
     public interface IRepo<T>
     {
         Task<T> Get(int id);
+         Task<T> Get(string id);
         Task<List<T>> All();
         Task<T> Add(T o);
     }

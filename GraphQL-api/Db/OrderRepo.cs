@@ -31,5 +31,10 @@ namespace GraphQL_api.Db
             await _db.SaveChangesAsync();
             return o;
         }
+
+        public async  Task<GraphQL_api.Models.Order> Get(string id){
+           throw new NotImplementedException();
+        }
+
     }
 }

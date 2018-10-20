@@ -33,17 +33,20 @@ namespace GraphQL_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDbContext<NorthwindbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<OrderRepo>();
-            // services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-            // services.AddSingleton<NorthwindQuery>();
-            // services.AddSingleton<NorthwindMutation>();
-            // services.AddSingleton<OrderType>();
-            // services.AddSingleton<OrderInputType>();
+            services.AddTransient<CustomerRepo>();
+            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
+            services.AddSingleton<GraphQL_api.Schema.CustomerType>();
+            services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
+            services.AddSingleton<NorthwindQuery>();
+            services.AddSingleton<NorthwindMutation>();
+            services.AddSingleton<GraphQL_api.Schema.CustomerType>();
+            services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
 
-            // var sp = services.BuildServiceProvider();
-            // services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
+            var sp = services.BuildServiceProvider();
+            services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
 
         }
 
@@ -54,10 +57,10 @@ namespace GraphQL_api
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
+            /* else
             {
                 app.UseHsts();
-            }
+            } */
 
             //app.UseHttpsRedirection();Only for MVC
             app.UseGraphiQl();

@@ -9,9 +9,9 @@ using GraphQL_api.Schema;
 
 namespace GraphQL_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class GraphQLController : ControllerBase
+    public class GraphQLController : Controller
     {
         private readonly IDocumentExecuter _documentExecuter;
         private readonly ISchema _schema;
