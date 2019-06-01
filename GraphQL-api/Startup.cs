@@ -16,7 +16,7 @@ using GraphQL.Types;
 using GraphQL_api.Models;
 using GraphQL_api.Db;
 using GraphQL_api.Schema;
-
+using AutoMapper;
 namespace GraphQL_api
 {
     public class Startup
@@ -34,17 +34,21 @@ namespace GraphQL_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddAutoMapper();
             services.AddDbContext<NorthwindbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddTransient<OrderRepo>();
             services.AddTransient<CustomerRepo>();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<GraphQL_api.Schema.CustomerType>();
-            services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
+            //services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
             services.AddSingleton<NorthwindQuery>();
             services.AddSingleton<NorthwindMutation>();
             services.AddSingleton<GraphQL_api.Schema.CustomerType>();
             services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
-
+            services.AddSingleton<GraphQL_api.Schema.CustomerCustomerDemoType>();
+            // services.AddSingleton<GraphQL_api.Schema.CustomerCustomerDemoInputType>();
+            services.AddSingleton<GraphQL_api.Schema.CustomerDemographicType>();
+            // services.AddSingleton<GraphQL_api.Schema.CustomerDemographicInputType>();
             var sp = services.BuildServiceProvider();
             services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
 

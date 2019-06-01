@@ -18,12 +18,14 @@ namespace GraphQL_api.Db
         
         public async  Task<GraphQL_api.Models.Customer> Get(string id){
             return await _db.Customers
-            .Include(o => o.CustomerCustomerDemo)//.ThenInclude(c=>c.CustomerCustomerDemo)
+            .Include(o => o.CustomerCustomerDemo).ThenInclude(c => c.CustomerType)
             .FirstOrDefaultAsync(p => p.CustomerId == id);
         }
 
         public async Task<List<GraphQL_api.Models.Customer>> All(){
-            return await _db.Customers.ToListAsync();
+            return await _db.Customers.Include(o => o.CustomerCustomerDemo)
+                .ThenInclude(c => c.CustomerType)
+            .ToListAsync();
         }
 
         public async Task<GraphQL_api.Models.Customer> Add(GraphQL_api.Models.Customer o){

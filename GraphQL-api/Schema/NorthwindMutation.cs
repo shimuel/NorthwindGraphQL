@@ -22,8 +22,8 @@ namespace GraphQL_api.Schema
             resolve: context =>
             {
                 var customer = context.GetArgument<GraphQL_api.Models.Customer>("customer");
-                return customerRepository.Get("ALFKI");
-                //return customerRepository.Add(customer);  
+                //return customerRepository.Get("ALFKI");
+                return customerRepository.Add(customer);  
             });
         }
     }

@@ -6,12 +6,13 @@ namespace GraphQL_api.Schema
 {
     public class NorthwindQuery : ObjectGraphType
     {
-         public NorthwindQuery(CustomerRepo customerRepository)
+        public NorthwindQuery(CustomerRepo customerRepository)
         {
             Field<CustomerType>(
                 "customer",
-                arguments: new QueryArguments(new QueryArgument<StringGraphType> { Name = "id" }),
-                resolve: context =>  customerRepository.Get(context.GetArgument<string>("id")));
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>>{ Name = "id" }),
+                resolve: context =>  customerRepository.Get(context.GetArgument<string>("id"))
+            );
             
             Field<ListGraphType<CustomerType>>(
                 "customers",
