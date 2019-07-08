@@ -12,7 +12,8 @@ namespace GraphQL_api.Schema
     {
         public CustomerType(CustomerRepo customerRepo)
         {
-            Field(x => x.CustomerId,type: typeof(IdGraphType)).Description("Customer's Id");
+            //Field(x => x.CustomerId,type: typeof(IdGraphType)).Description("Customer's Id");
+            Field(x => x.CustomerId,false);
             Field(x => x.CompanyName,true);
             Field(x => x.ContactName,true);            
             Field(x => x.ContactTitle,true);
@@ -40,6 +41,7 @@ namespace GraphQL_api.Schema
         public CustomerInputType()
         {
                 Name = "CustomerInput";
+                Field<NonNullGraphType<StringGraphType>>("CustomerId");
                 Field<NonNullGraphType<StringGraphType>>("CompanyName");
                 Field<StringGraphType>("ContactName");
                 Field<StringGraphType>("ContactTitle");
@@ -59,11 +61,31 @@ namespace GraphQL_api.Schema
         }
     }
 
+    public class CustomerCustomerDemoTypeInputType : InputObjectGraphType
+    {
+        public CustomerCustomerDemoTypeInputType()
+        {
+                Name = "CustomerCustomerDemoTypeInput";
+                Field<NonNullGraphType<StringGraphType>>("CustomerId");
+                Field<StringGraphType>("CustomerTypeId");
+        }
+    }
+
     public class CustomerDemographicType: ObjectGraphType <CustomerDemographic> {  
         public CustomerDemographicType() {
             Field(c => c.CustomerTypeId);
             Field(c => c.CustomerDesc);
             Field(c => c.CustomerCustomerDemo, false, type: typeof(ListGraphType<CustomerCustomerDemoType>));
+        }
+    }
+
+    public class CustomerDemographicTypeInputType : InputObjectGraphType
+    {
+        public CustomerDemographicTypeInputType()
+        {
+                Name = "CustomerDemographicTypeInput";
+                Field<NonNullGraphType<StringGraphType>>("CustomerTypeId");
+                Field<StringGraphType>("CustomerDesc");
         }
     }
 }

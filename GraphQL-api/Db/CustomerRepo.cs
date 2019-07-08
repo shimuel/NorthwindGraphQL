@@ -29,7 +29,7 @@ namespace GraphQL_api.Db
         }
 
         public async Task<GraphQL_api.Models.Customer> Add(GraphQL_api.Models.Customer o){
-            await _db.Customers.AddAsync(o);
+            o = _db.Customers.AddAsync(o).Result.Entity;
             await _db.SaveChangesAsync();
             return o;
         }
