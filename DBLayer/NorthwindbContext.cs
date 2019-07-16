@@ -1,9 +1,9 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using GraphQL_api.Models;
+using DBLayer.Entities;
 
-namespace GraphQL_api.Db
+namespace DBLayer
 {
     public partial class NorthwindbContext : DbContext
     {

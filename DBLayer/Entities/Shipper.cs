@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GraphQL_api.Models
+namespace DBLayer.Entities
 {
     public partial class Shipper
     {

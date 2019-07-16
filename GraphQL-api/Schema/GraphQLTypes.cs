@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GraphQL.Types;
-using GraphQL_api.Db;
-using GraphQL_api.Models;
+using DBLayer;
+using DBLayer.Entities;
 using AutoMapper;
 
 namespace GraphQL_api.Schema
 {
     public class CustomerType : ObjectGraphType<Customer>
     {
-        public CustomerType(CustomerRepo customerRepo)
+        public CustomerType(IUnitOfWork uow)
         {
             //Field(x => x.CustomerId,type: typeof(IdGraphType)).Description("Customer's Id");
             Field(x => x.CustomerId,false);
@@ -24,15 +24,6 @@ namespace GraphQL_api.Schema
             Field(x => x.Fax,true);
             Field(x => x.Phone,true);
             Field(x => x.CustomerCustomerDemo,true, type: typeof(ListGraphType<CustomerCustomerDemoType>)).Description("Author's books");
-            // Field <ListGraphType<CustomerCustomerDemoType> ,  IEnumerable<CustomerCustomerDemo>> ()
-            //         .Name("Demographics")
-            //         .Resolve(ctx => {
-            //             return customerRepo.Get(ctx.Source.CustomerId).Result.CustomerCustomerDemo;
-            //         });
-            //Field<StringGraphType>("birthDate", resolve: context => context.Source.BirthDate.ToShortDateString());
-            // Field<ListGraphType<SkaterStatisticType>>("skaterSeasonStats",
-            //     arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),
-            //     resolve: context => skaterStatisticRepository.Get(context.Source.Id), description: "Player's skater stats");
         }
     }
 

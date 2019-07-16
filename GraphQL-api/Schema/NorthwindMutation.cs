@@ -3,12 +3,13 @@ using System;
 using System.Collections.Generic;
 using GraphQL;
 using GraphQL.Types;
-using GraphQL_api.Db;
+using DBLayer;
+using DBLayer.Entities;
 namespace GraphQL_api.Schema
 {
     public class NorthwindMutation : ObjectGraphType
     {
-        public NorthwindMutation(Db.CustomerRepo customerRepository)
+        public NorthwindMutation(IUnitOfWork uow)
         {
 
 
@@ -21,9 +22,12 @@ namespace GraphQL_api.Schema
             ),
             resolve: context =>
             {
-                var customer = context.GetArgument<GraphQL_api.Models.Customer>("customer");
+                var customer = context.GetArgument<Customer>("customer");
                 //return customerRepository.Get("ALFKI");
-                return customerRepository.Add(customer);  
+                //return customerRepository.Add(customer);  
+                 uow.GetRepositoryAsync<Customer>().AddAsync(customer);
+                 uow.SaveChanges();
+                 return  uow.GetRepositoryAsync<Customer>().SingleAsync(predicate: p=> p.CustomerId == customer.CustomerId);
             });
         }
     }

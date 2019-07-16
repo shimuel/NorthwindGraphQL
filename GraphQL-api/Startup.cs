@@ -13,8 +13,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using GraphQL;
 using GraphQL.Types;
-using GraphQL_api.Models;
-using GraphQL_api.Db;
+using DBLayer;
+using DBLayer.DI;
+using DBLayer.Entities;
 using GraphQL_api.Schema;
 using AutoMapper;
 namespace GraphQL_api
@@ -35,9 +36,13 @@ namespace GraphQL_api
         {
             services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper();
-            services.AddDbContext<NorthwindbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddTransient<OrderRepo>();
-            services.AddTransient<CustomerRepo>();
+
+             services.AddDbContext<NorthwindbContext>(options =>
+                   options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))).AddUnitOfWork<NorthwindbContext>();
+
+            // services.AddDbContext<NorthwindbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            // services.AddTransient<OrderRepo>();
+            // services.AddTransient<CustomerRepo>();
             services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
             services.AddSingleton<GraphQL_api.Schema.CustomerType>();
             //services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GraphQL_api.Models
+namespace DBLayer.Entities
 {
-    public partial class Supplier
+    public partial class Customer
     {
-        public Supplier()
+        public Customer()
         {
-            Products = new HashSet<Product>();
+            CustomerCustomerDemo = new HashSet<CustomerCustomerDemo>();
+            Orders = new HashSet<Order>();
         }
 
-        public long SupplierId { get; set; }
+        public string CustomerId { get; set; }
         public string CompanyName { get; set; }
         public string ContactName { get; set; }
         public string ContactTitle { get; set; }
@@ -21,8 +22,8 @@ namespace GraphQL_api.Models
         public string Country { get; set; }
         public string Phone { get; set; }
         public string Fax { get; set; }
-        public string HomePage { get; set; }
 
-        public ICollection<Product> Products { get; set; }
+        public ICollection<CustomerCustomerDemo> CustomerCustomerDemo { get; set; }
+        public ICollection<Order> Orders { get; set; }
     }
 }
