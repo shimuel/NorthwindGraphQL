@@ -48,12 +48,16 @@ namespace GraphQL_api
             //services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
             services.AddSingleton<NorthwindQuery>();
             services.AddSingleton<NorthwindMutation>();
+            
             services.AddSingleton<GraphQL_api.Schema.CustomerType>();
             services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
+            
             services.AddSingleton<GraphQL_api.Schema.CustomerCustomerDemoType>();
-            // services.AddSingleton<GraphQL_api.Schema.CustomerCustomerDemoInputType>();
+            services.AddSingleton<GraphQL_api.Schema.CustomerCustomerDemoTypeInputType>();
+
             services.AddSingleton<GraphQL_api.Schema.CustomerDemographicType>();
-            // services.AddSingleton<GraphQL_api.Schema.CustomerDemographicInputType>();
+            services.AddSingleton<GraphQL_api.Schema.CustomerDemographicType>();
+            
             var sp = services.BuildServiceProvider();
             services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
 

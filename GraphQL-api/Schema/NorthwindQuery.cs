@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using GraphQL;
 using GraphQL.Types;
 using DBLayer;
 using DBLayer.Entities;
+using Microsoft.EntityFrameworkCore;
+
 namespace GraphQL_api.Schema
 {
     public class NorthwindQuery : ObjectGraphType
@@ -13,23 +16,19 @@ namespace GraphQL_api.Schema
                 "customer",
                 arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>>{ Name = "id" }),
                 resolve: context =>
-                {
+                {         
                     var id = context.GetArgument<string>("id");
-                    var tmp = uow.GetRepositoryAsync<Customer>().SingleAsync(predicate: p=> p.CustomerId == id);
-                    return tmp;
+                    return uow.GetRepositoryAsync<Customer>().SingleAsync(predicate: i=> i.CustomerId == id,
+                     include: q => q.Include(j => j.CustomerCustomerDemo).ThenInclude(k=>k.CustomerType));
                 }
-                // resolve: context =>
-                // {
-                //     var id = context.GetArgument<string>("id");
-                //     return uow.GetReadOnlyRepository<Customer>().Search( id);
-                // }
             );
 
             Field<ListGraphType<CustomerType>>(
                 "customers",
                 resolve: context => {
-                     var tmp = uow.GetRepositoryAsync<Customer>().GetListAsync();
-                     return tmp.Result.Items;
+                     var tmp = uow.GetRepositoryAsync<Customer>().GetListAsync(
+                        include: q => q.Include(j => j.CustomerCustomerDemo).ThenInclude(k=>k.CustomerType));                     
+                    return tmp.Result.Items;
             });
         }
 
