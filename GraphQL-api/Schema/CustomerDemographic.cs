@@ -22,7 +22,7 @@ namespace GraphQL_api.Schema
         {
                 Name = "CustomerCustomerDemoTypeInput";
                 Field<NonNullGraphType<StringGraphType>>("CustomerId");
-                Field<StringGraphType>("CustomerTypeId");
+                Field<NonNullGraphType<StringGraphType>>("CustomerTypeId");
         }
     }
 
@@ -40,7 +40,7 @@ namespace GraphQL_api.Schema
         {
                 Name = "CustomerDemographicTypeInput";
                 Field<NonNullGraphType<StringGraphType>>("CustomerTypeId");
-                Field<StringGraphType>("CustomerDesc");
+                Field<NonNullGraphType<StringGraphType>>("CustomerDesc");
         }
     }
 }

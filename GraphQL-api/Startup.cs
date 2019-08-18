@@ -14,8 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using GraphQL;
 using GraphQL.Types;
 using DBLayer;
-using DBLayer.DI;
-using DBLayer.Entities;
+using GraphQL_api.DI;
+// using DBLayer.Entities;
 using GraphQL_api.Schema;
 using AutoMapper;
 namespace GraphQL_api
@@ -38,29 +38,10 @@ namespace GraphQL_api
             services.AddAutoMapper();
 
              services.AddDbContext<NorthwindbContext>(options =>
-                   options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))).AddUnitOfWork<NorthwindbContext>();
-
-            // services.AddDbContext<NorthwindbContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            // services.AddTransient<OrderRepo>();
-            // services.AddTransient<CustomerRepo>();
-            services.AddSingleton<IDocumentExecuter, DocumentExecuter>();
-            services.AddSingleton<GraphQL_api.Schema.CustomerType>();
-            //services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
-            services.AddSingleton<NorthwindQuery>();
-            services.AddSingleton<NorthwindMutation>();
-            
-            services.AddSingleton<GraphQL_api.Schema.CustomerType>();
-            services.AddSingleton<GraphQL_api.Schema.CustomerInputType>();
-            
-            services.AddSingleton<GraphQL_api.Schema.CustomerCustomerDemoType>();
-            services.AddSingleton<GraphQL_api.Schema.CustomerCustomerDemoTypeInputType>();
-
-            services.AddSingleton<GraphQL_api.Schema.CustomerDemographicType>();
-            services.AddSingleton<GraphQL_api.Schema.CustomerDemographicType>();
+                   options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))).AddUnitOfWork<NorthwindbContext>();                        
             
             var sp = services.BuildServiceProvider();
             services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
