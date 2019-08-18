@@ -6,33 +6,26 @@ using DBLayer;
 using DBLayer.Entities;
 using AutoMapper;
 
-namespace GraphQL_api.Schema
+namespace GraphQL_api.Schema.Model
 {
-    public class CustomerType : ObjectGraphType<Customer>
+    public class ShipperType : ObjectGraphType<Shipper>
     {
-        public CustomerType(IUnitOfWork uow)
+        public ShipperType(IUnitOfWork uow)
         {
             //Field(x => x.CustomerId,type: typeof(IdGraphType)).Description("Customer's Id");
-            Field(x => x.CustomerId,false);
+            Field(x => x.ShipperId,false);
             Field(x => x.CompanyName,true);
-            Field(x => x.ContactName,true);            
-            Field(x => x.ContactTitle,true);
-            Field(x => x.Address,true);
-            Field(x => x.City,true);
-            Field(x => x.Country,true);
-            Field(x => x.Region,true);
-            Field(x => x.Fax,true);
             Field(x => x.Phone,true);
-            Field(x => x.CustomerCustomerDemo,true, type: typeof(ListGraphType<CustomerCustomerDemoType>)).Description("Customer Demographics");
+            Field(x => x.Orders,true, type: typeof(ListGraphType<OrderType>)).Description("Customer Demographics");
         }
     }
 
-    public class CustomerInputType : InputObjectGraphType
+    public class ShipperTypeInputType : InputObjectGraphType
     {
-        public CustomerInputType()
+        public ShipperTypeInputType()
         {
-                Name = "CustomerInput";
-                Field<NonNullGraphType<StringGraphType>>("CustomerId");
+                Name = "ShipperInput";
+                Field<NonNullGraphType<IntGraphType>>("CustomerId");
                 Field<NonNullGraphType<StringGraphType>>("CompanyName");
                 Field<StringGraphType>("ContactName");
                 Field<StringGraphType>("ContactTitle");

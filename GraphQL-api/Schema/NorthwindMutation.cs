@@ -5,6 +5,8 @@ using GraphQL;
 using GraphQL.Types;
 using DBLayer;
 using DBLayer.Entities;
+using GraphQL_api.Schema.Model;
+
 namespace GraphQL_api.Schema
 {
     public class NorthwindMutation : ObjectGraphType

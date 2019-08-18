@@ -11,13 +11,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 using GraphQL;
 using GraphQL.Types;
 using DBLayer;
 using GraphQL_api.DI;
-// using DBLayer.Entities;
+using DBLayer.Entities;
 using GraphQL_api.Schema;
 using AutoMapper;
+using GraphQL_api.Auth.Services;
+
 namespace GraphQL_api
 {
     public class Startup
@@ -37,8 +44,70 @@ namespace GraphQL_api
             services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper();
 
-             services.AddDbContext<NorthwindbContext>(options =>
-                   options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))).AddUnitOfWork<NorthwindbContext>();                        
+            /*
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecificOrigin",
+                    builder => builder.WithOrigins("http://localhost:3000","http://localhost:8080")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials() 
+                );
+            });
+
+            services.AddDbContext<UserContext>(
+                opt => opt.UseInMemoryDatabase("GraphqlUsers")
+            ).AddUnitOfWork<UserContext>();   
+
+            //configure strongly typed settings objects
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            // configure jwt authentication
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = context =>
+                    {
+                        var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                        var userId = int.Parse(context.Principal.Identity.Name);
+                        var user = userService.GetById(userId);
+                        if (user == null)
+                        {
+                            // return unauthorized if user no longer exists
+                            context.Fail("Unauthorized");
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
+            */
+            
+            //Graphiql
+            services.AddDbContext<NorthwindbContext>(options =>
+                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
+                ).AddUnitOfWork<NorthwindbContext>();                        
             
             var sp = services.BuildServiceProvider();
             services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
