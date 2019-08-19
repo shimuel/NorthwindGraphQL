@@ -17,6 +17,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 using GraphQL;
+using GraphiQl;
+
 using GraphQL.Types;
 using DBLayer;
 using GraphQL_api.DI;
