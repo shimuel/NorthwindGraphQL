@@ -12,22 +12,22 @@ const  Header = () => {
         <Navbar.Collapse>
           <Nav className="mr-auto">
             <Nav.Item>
-              <Nav.Link eventKey="1" as={Link} to="/Home">
+              <Nav.Link className="NavLink" eventKey="1" as={Link} to="/">
                 Home
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-                <Nav.Link eventKey="2" as={Link} to="/first">
+                <Nav.Link className="NavLink" eventKey="2" as={Link} to="/first">
                 Features
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="3" as={Link} to="/second">
+              <Nav.Link className="NavLink" eventKey="3" as={Link} to="/second">
                 Prices
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="3" as={Link} to="/third">
+              <Nav.Link className="NavLink"  eventKey="3" as={Link} to="/third">
                 Other
               </Nav.Link>
             </Nav.Item>
