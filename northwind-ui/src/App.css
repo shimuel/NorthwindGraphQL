@@ -1,32 +1,31 @@
-.my-node-enter {
-  opacity: 0;
+.App {
+  margin-top: 15px;
 }
-.my-node-enter-active {
-  opacity: 1;
-  transition: opacity 200ms;
+
+.App .navbar-brand {
+  font-weight: bold;
 }
-.my-node-exit {
-  opacity: 1;
+
+.Home .lander {
+  padding: 80px 0;
+  text-align: center;
+  border: solid 1px orange;
 }
-.my-node-exit-active {
-  opacity: 0;
-  transition: opacity 200ms;
-  border:  palegreen 1px solid
+
+.Home .lander h1 {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
 }
-.alert-enter {
-  opacity: 0;
-  transform: scale(0.9);
+
+.Home .lander p {
+  color: #999;
 }
-.alert-enter-active {
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 300ms, transform 300ms;
+
+.NavLink {
+  font-weight:bold;
+  color:#999;
 }
-.alert-exit {
-  opacity: 1;
-}
-.alert-exit-active {
-  opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 300ms, transform 300ms;
+.NavDropdown {
+  color:#999;
+  font-weight:bold;
 }

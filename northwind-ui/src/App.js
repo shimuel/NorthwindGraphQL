@@ -1,20 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router } from "react-router-dom";
+import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import { Navbar } from "react-bootstrap";
+import Header from './components/Header'
+import Main from './components/Main'
 
-// import logo from './logo.svg';
-import './App.css';
-import Header from "./components/Header";
-import Container from "./components/Container";
+import "./App.css";
 
-const App = () => {
-  return (
-    <Router>
-    <div>
-      <Header />
-      <Container />
-    </div>
-  </Router>
-  );
-}
+const App = () =>
+ (
+    <>      
+      <Header />    
+      <Main />    
+    </>
+)
+ export default App
 
-export default App;
