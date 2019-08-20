@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom'
-import { createBrowserHistory } from "history";
+
 
 //import './index.css';
 import App from './App';
@@ -22,13 +21,9 @@ const client = new ApolloClient({
   cache: new InMemoryCache()
 })
 
-const history = createBrowserHistory()
-
 ReactDOM.render(
-  <ApolloProvider client={client}>
-    <BrowserRouter history={history}>
+  <ApolloProvider client={client}>   
     <App />
-    </BrowserRouter>
   </ApolloProvider>,
   document.getElementById('root')
 )
