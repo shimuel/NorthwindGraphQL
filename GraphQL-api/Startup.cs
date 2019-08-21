@@ -45,8 +45,7 @@ namespace GraphQL_api
         {
             services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddAutoMapper();
-
-            /*
+            
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowSpecificOrigin",
@@ -56,7 +55,7 @@ namespace GraphQL_api
                     .AllowCredentials() 
                 );
             });
-
+            /*
             services.AddDbContext<UserContext>(
                 opt => opt.UseInMemoryDatabase("GraphqlUsers")
             ).AddUnitOfWork<UserContext>();   
@@ -128,6 +127,12 @@ namespace GraphQL_api
             } */
 
             //app.UseHttpsRedirection();Only for MVC
+            
+            // app.UseDefaultFiles();
+            // app.UseStaticFiles();
+            // app.UseHttpsRedirection();
+
+            app.UseCors("AllowSpecificOrigin");
             app.UseGraphiQl();
             app.UseMvc();
         }

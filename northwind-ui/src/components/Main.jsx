@@ -2,7 +2,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import styled from "styled-components";
 
-import Home  from './Pages/Home'
+import { Home }  from './Pages/Home'
 import First from './Pages/First';
 import Second from './Pages/Second';
 import Third from './Pages/Third';

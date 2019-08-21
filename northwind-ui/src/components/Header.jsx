@@ -1,12 +1,12 @@
 import React,{Component} from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { NavItem, FormControl, Navbar, NavDropdown, Button, Nav, Form } from 'react-bootstrap';
+import { FormControl, Navbar, NavDropdown, Button, Nav, Form } from 'react-bootstrap';
 //import { LinkContainer } from "react-router-bootstrap";
 import "../App.css"
 const  Header = () => {         
   return (     
     <>
-      <Navbar collapseOnSelect  expand="lg">
+      <Navbar collapseOnSelect  expand="lg" bg="dark" variant="dark">
         <Navbar.Brand style={{cursor: "none"}}>Navbar</Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse>
@@ -27,13 +27,13 @@ const  Header = () => {
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link className="NavLink"  eventKey="3" as={Link} to="/third">
+              <Nav.Link className="NavLink"  eventKey="4" as={Link} to="/third">
                 Other
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
             <NavDropdown title="Dropdown" className="NavDropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item><NavLink className="NavLink" to="/">Action</NavLink></NavDropdown.Item>
+              <NavDropdown.Item>Action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
               <NavDropdown.Divider />

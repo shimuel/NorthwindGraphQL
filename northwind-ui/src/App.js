@@ -1,6 +1,4 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import { Navbar } from "react-bootstrap";
+import React from "react";
 import Header from './components/Header'
 import Main from './components/Main'
 import { BrowserRouter } from 'react-router-dom'
