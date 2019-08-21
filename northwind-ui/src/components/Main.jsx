@@ -2,10 +2,10 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import styled from "styled-components";
 
-import Home  from './Home'
-import First from './First';
-import Second from './Second';
-import Third from './Third';
+import Home  from './Pages/Home'
+import First from './Pages/First';
+import Second from './Pages/Second';
+import Third from './Pages/Third';
 
 const  Main = () => {         
     return (
