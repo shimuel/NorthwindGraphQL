@@ -1,4 +1,4 @@
-namespace GraphQL_api.Auth.Services
+namespace GraphQL_api.Auth
 {
     public class UserDto
     {
@@ -7,5 +7,6 @@ namespace GraphQL_api.Auth.Services
         public string LastName { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
+        public string Token { get; set; }
     }
 }

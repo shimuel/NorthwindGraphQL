@@ -6,21 +6,11 @@ using DBLayer.Entities;
 
 namespace GraphQL_api.Auth.Services
 {
-    public interface IUserService
-    {
-        User Authenticate(string username, string password);
-        IEnumerable<User> GetAll();
-        User GetById(int id);
-        User Create(User user, string password);
-        void Update(User user, string password = null);
-        void Delete(int id);
-    }
-
     public class UserService : IUserService
     {
-        private IUnitOfWork _context;
+        private IUnitOfWork<UserDBContext> _context;
 
-        public UserService(IUnitOfWork uow)
+        public UserService(IUnitOfWork<UserDBContext> uow)
         {
             _context = uow;
         }
@@ -37,7 +27,7 @@ namespace GraphQL_api.Auth.Services
                 return null;
 
             // check if password is correct
-            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+            if (!UserUtil.VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 return null;
 
             // authentication successful
@@ -64,12 +54,12 @@ namespace GraphQL_api.Auth.Services
                 throw new AppException("Username \"" + user.Username + "\" is already taken");
 
             byte[] passwordHash, passwordSalt;
-            CreatePasswordHash(password, out passwordHash, out passwordSalt);
+            UserUtil.CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
-            _context.GetRepository<User>().GetList().Items.Add(user);
+            _context.GetRepository<User>().Add(user);
             _context.SaveChanges();
 
             return user;
@@ -98,7 +88,7 @@ namespace GraphQL_api.Auth.Services
             if (!string.IsNullOrWhiteSpace(password))
             {
                 byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+                UserUtil.CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
@@ -118,37 +108,16 @@ namespace GraphQL_api.Auth.Services
             }
         }
 
-        // private helper methods
-
-        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-        {
-            if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
-
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
-            {
-                passwordSalt = hmac.Key;
-                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-            }
-        }
-
-        private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
-        {
-            if (password == null) throw new ArgumentNullException("password");
-            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
-            if (storedHash.Length != 64) throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
-            if (storedSalt.Length != 128) throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
-
-            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
-            {
-                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                for (int i = 0; i < computedHash.Length; i++)
-                {
-                    if (computedHash[i] != storedHash[i]) return false;
-                }
-            }
-
-            return true;
-        }
     }
+
+    public interface IUserService
+    {
+        User Authenticate(string username, string password);
+        IEnumerable<User> GetAll();
+        User GetById(int id);
+        User Create(User user, string password);
+        void Update(User user, string password = null);
+        void Delete(int id);
+    }
+
 }

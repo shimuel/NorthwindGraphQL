@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using GraphQL;
 using GraphQL.Types;
 using GraphQL_api.Schema;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GraphQL_api.Controllers
 {
     [Route("[controller]")]
-    [ApiController]
+    [ApiController]    
     public class GraphQLController : Controller
     {
         private readonly IDocumentExecuter _documentExecuter;
@@ -23,6 +24,7 @@ namespace GraphQL_api.Controllers
         }
         
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Post([FromBody] GraphQL_api.Schema.GraphQLQuery query)
         {
             if (query == null) { throw new ArgumentNullException(nameof(query)); }

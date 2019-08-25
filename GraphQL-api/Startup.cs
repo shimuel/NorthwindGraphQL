@@ -25,6 +25,9 @@ using GraphQL_api.DI;
 using DBLayer.Entities;
 using GraphQL_api.Schema;
 using AutoMapper;
+
+using GraphQL_api.Mappings;
+using GraphQL_api.Auth;
 using GraphQL_api.Auth.Services;
 
 namespace GraphQL_api
@@ -44,7 +47,20 @@ namespace GraphQL_api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddAutoMapper();
+            // var mappingConfig = new MapperConfiguration(mc =>
+            // {
+            //     mc.AddProfile(new MappingProfile());
+            // });
+
+            var configuration = new MapperConfiguration(cfg => 
+            {
+                cfg.AddProfile<MappingProfile>();
+            });
+            // only during development, validate your mappings; remove it before release
+            configuration.AssertConfigurationIsValid();
+            // use DI (http://docs.automapper.org/en/latest/Dependency-injection.html) or create the mapper yourself
+            var mapper = configuration.CreateMapper();
+            services.AddSingleton(mapper);
             
             services.AddCors(options =>
             {
@@ -55,10 +71,11 @@ namespace GraphQL_api
                     .AllowCredentials() 
                 );
             });
-            /*
-            services.AddDbContext<UserContext>(
+            
+            //Begining of User
+            services.AddDbContext<UserDBContext>(
                 opt => opt.UseInMemoryDatabase("GraphqlUsers")
-            ).AddUnitOfWork<UserContext>();   
+            ).AddUnitOfWork<UserDBContext>();   
 
             //configure strongly typed settings objects
             var appSettingsSection = Configuration.GetSection("AppSettings");
@@ -81,9 +98,11 @@ namespace GraphQL_api
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                         var userId = int.Parse(context.Principal.Identity.Name);
+                        Console.Write("USER ID ????????????????????????????????????????????????????????"+userId);
                         var user = userService.GetById(userId);
                         if (user == null)
                         {
+                            Console.Write("No User ????????????????????????????????????????????????????????");
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
                         }
@@ -103,8 +122,8 @@ namespace GraphQL_api
 
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
-            */
-            
+            //End of User
+        
             //Graphiql
             services.AddDbContext<NorthwindbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection"))
@@ -131,7 +150,11 @@ namespace GraphQL_api
             // app.UseDefaultFiles();
             // app.UseStaticFiles();
             // app.UseHttpsRedirection();
-
+        // app.UseDefaultFiles();
+        // app.UseStaticFiles();
+        app.UseAuthentication();
+        //app.UseJwtTokenMiddleware();
+        //app.UseMvcWithDefaultRoute();
             app.UseCors("AllowSpecificOrigin");
             app.UseGraphiQl();
             app.UseMvc();

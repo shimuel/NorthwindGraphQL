@@ -2,9 +2,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DBLayer.Entities
 {
-    public class UserContext : DbContext
+    public class UserDBContext : DbContext
     {
-        public UserContext(DbContextOptions<UserContext> options)
+
+        public UserDBContext(DbContextOptions<UserDBContext> options)
             : base(options)
         {
         }

@@ -11,47 +11,11 @@ import  { GET_ORDERS } from '../../graphql/queries'
 
 export const Home = () =>  {
 
-  const [getData, setData] = useState({
-    columns: [
-      {
-        label: "Date",
-        prop: "date",
-        width: 180
-      },
-      {
-        label: "Name",
-        prop: "name",
-        width: 180
-      },
-      {
-        label: "Address",
-        prop: "address"
-      }
-    ],
-    data: [{
-      date: '2016-05-03',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles'
-    }, {
-      date: '2016-05-02',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles'
-    }, {
-      date: '2016-05-04',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles'
-    }, {
-      date: '2016-05-01',
-      name: 'Tom',
-      address: 'No. 189, Grove St, Los Angeles'
-    }]
-  })
-
-
+  
   const { loading, error, data } = useQuery(GET_ORDERS);
 
   if (loading) return 'Loading...';
-  if (error) return `Error! ${error.message}`;
+  if (error) return error
 
   const orders = data.orders.map(order => {
       const {customer:customer, orderDate:orderDate, shipViaNavigation:shipViaNavigation} = order
