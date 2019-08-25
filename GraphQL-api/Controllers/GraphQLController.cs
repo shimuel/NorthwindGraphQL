@@ -1,11 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using GraphQL;
 using GraphQL.Types;
-using GraphQL_api.Schema;
 using Microsoft.AspNetCore.Authorization;
 
 namespace GraphQL_api.Controllers

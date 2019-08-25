@@ -1,22 +1,9 @@
 import { ApolloClient } from 'apollo-client'
-import { ApolloLink } from "apollo-link";
 import { createHttpLink } from 'apollo-link-http'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 
-import { onError } from "apollo-link-error";
-import { RestLink } from "apollo-link-rest";
-
-
 const createClient = (token) => {
 
-    // const httpLink = createHttpLink({
-    //     uri: 'https://localhost:5001/graphql/',
-    //     credentials: 'include',
-    //     headers : {
-    //       'Access-Control-Allow-Origin': '*',
-    //       'Content-Type': 'application/graphql',
-    //     }
-    // })
     token = localStorage.getItem('id_token');
     const client = new ApolloClient({
       link: new createHttpLink({
@@ -40,7 +27,7 @@ const authenticate = async (url = 'https://localhost:5001/users/authenticate', d
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         mode: 'cors', // no-cors, cors, *same-origin
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-        //credentials: 'same-origin', // include, *same-origin, omit
+        credentials: 'include', //*same-origin, omit
         headers: {
             'Content-Type': 'application/json',
             // 'Content-Type': 'application/x-www-form-urlencoded',
@@ -63,10 +50,9 @@ const authenticate = async (url = 'https://localhost:5001/users/authenticate', d
     .then(response => {  
       if(response)        
           localStorage.setItem('id_token', response.token)          
-
+          
       return Promise.resolve(!!response);
     })
-     // parses JSON response into native JavaScript objects 
 }
 
 

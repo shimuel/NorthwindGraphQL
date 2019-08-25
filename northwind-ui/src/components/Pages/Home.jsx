@@ -11,7 +11,6 @@ import  { GET_ORDERS } from '../../graphql/queries'
 
 export const Home = () =>  {
 
-  
   const { loading, error, data } = useQuery(GET_ORDERS);
 
   if (loading) return 'Loading...';

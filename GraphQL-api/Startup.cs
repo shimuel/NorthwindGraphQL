@@ -46,18 +46,14 @@ namespace GraphQL_api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            // var mappingConfig = new MapperConfiguration(mc =>
-            // {
-            //     mc.AddProfile(new MappingProfile());
-            // });
+            services.AddMvc();
 
             var configuration = new MapperConfiguration(cfg => 
             {
                 cfg.AddProfile<MappingProfile>();
             });
             // only during development, validate your mappings; remove it before release
-            configuration.AssertConfigurationIsValid();
+            // configuration.AssertConfigurationIsValid();
             // use DI (http://docs.automapper.org/en/latest/Dependency-injection.html) or create the mapper yourself
             var mapper = configuration.CreateMapper();
             services.AddSingleton(mapper);
@@ -98,11 +94,11 @@ namespace GraphQL_api
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
                         var userId = int.Parse(context.Principal.Identity.Name);
-                        Console.Write("USER ID ????????????????????????????????????????????????????????"+userId);
+                        // Console.Write("USER ID ????????????????????????????????????????????????????????"+userId);
                         var user = userService.GetById(userId);
                         if (user == null)
                         {
-                            Console.Write("No User ????????????????????????????????????????????????????????");
+                            // Console.Write("No User ????????????????????????????????????????????????????????");
                             // return unauthorized if user no longer exists
                             context.Fail("Unauthorized");
                         }
@@ -132,7 +128,6 @@ namespace GraphQL_api
             var sp = services.BuildServiceProvider();
             services.AddSingleton<ISchema>(new NorthwindSchema(new FuncDependencyResolver(type => sp.GetService(type))));
         }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -140,21 +135,7 @@ namespace GraphQL_api
             {
                 app.UseDeveloperExceptionPage();
             }
-            /* else
-            {
-                app.UseHsts();
-            } */
-
-            //app.UseHttpsRedirection();Only for MVC
-            
-            // app.UseDefaultFiles();
-            // app.UseStaticFiles();
-            // app.UseHttpsRedirection();
-        // app.UseDefaultFiles();
-        // app.UseStaticFiles();
-        app.UseAuthentication();
-        //app.UseJwtTokenMiddleware();
-        //app.UseMvcWithDefaultRoute();
+            app.UseAuthentication();
             app.UseCors("AllowSpecificOrigin");
             app.UseGraphiQl();
             app.UseMvc();
