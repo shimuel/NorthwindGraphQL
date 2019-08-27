@@ -183,7 +183,6 @@ const MyTable = (props) => {
                 type="number"
                 defaultValue={pageIndex + 1}
                 onChange={e => {
-                    debugger
                 const page = e.target.value ? Number(e.target.value) - 1 : 0
                 gotoPage(page)
                 }}
