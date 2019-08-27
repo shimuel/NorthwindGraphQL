@@ -7,6 +7,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import { ApolloProvider } from '@apollo/react-hooks'
 import { createClient,  authenticate } from './graphql/Client'
+import 'semantic-ui-css/semantic.min.css';
 
 let authenticated = false;
 

@@ -26,14 +26,6 @@ const GET_ORDERS = gql`
     }    
 `;
 
-// const AUTH_USER = gql`
-//   query authenticate {
-//     Auth @rest(type: "User", path: "/users/authenticate", endpoint: "auth") {
-//       name
-//     }
-//   }
-// `;
-
 const AUTH_USER = gql`
   mutation authenticate($input: newUser!) {
     authenticate(input: $newUser)
@@ -45,4 +37,4 @@ const AUTH_USER = gql`
   }
 `;
 
-export { GET_ORDERS, AUTH_USER }
+export { GET_ORDERS }

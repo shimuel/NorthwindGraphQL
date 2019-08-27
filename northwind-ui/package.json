@@ -10,8 +10,6 @@
     "apollo-link": "^1.2.12",
     "apollo-link-rest": "^0.7.3",
     "bootstrap": "^4.3.1",
-    "element-react": "^1.4.34",
-    "element-theme-default": "^1.4.13",
     "fetch": "^1.1.0",
     "graphql": "^14.5.3",
     "graphql-anywhere": "^4.2.4",
@@ -24,6 +22,9 @@
     "react-router-bootstrap": "^0.25.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.1.1",
+    "react-table": "^7.0.0-alpha.27",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.88.0",
     "styled-components": "^5.0.0-beta.8",
     "yarn": "^1.17.3"
   },
