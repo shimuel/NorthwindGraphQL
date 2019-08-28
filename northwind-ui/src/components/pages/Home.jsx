@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../../App.css";
 
 import { Container } from 'react-bootstrap';
-import { LoadOrders } from '../loaders/homeloaders';
+import { OrdersView } from '../views/RenderHome';
 
 import {
   Button,
@@ -18,7 +18,7 @@ export const Home = () =>  {
 
   return (
       <Container>
-        <LoadOrders />
+        <OrdersView />
       </Container>
   )
 }
