@@ -6,7 +6,9 @@ import  { GridWrapper } from '../Grid'
 
 const OrdersView = () => {
 
-    const { loading, error, data } = useQuery(GET_ORDERS);
+    const { data, loading, error, fetchMore } = useQuery(GET_ORDERS, {   
+            variables: {"index": 1,"size": 5},
+    });
 
     if (loading) {
       return <div>Loading...</div>;
@@ -47,7 +49,7 @@ const OrdersView = () => {
             
     return (
         <div className="Home">           
-            <GridWrapper data = {allOrds} columns={columns} pageSize={5} initialSortColumn='companyName'/>            
+            <GridWrapper data = {allOrds} columns={columns} pageSize={5} initialSortColumn='companyName' />            
         </div>
     )
 }

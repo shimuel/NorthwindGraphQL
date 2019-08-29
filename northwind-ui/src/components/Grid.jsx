@@ -29,7 +29,7 @@ const GridWrapper = (props) => {
     let col = columns[0].columns[2];
         col.Filter = SelectColumnFilter
         col.filter =  'includes'
-        
+
     // Other Filter Types available
     //   Filter: SliderColumnFilter,
     //   filter: 'equals',
@@ -46,20 +46,8 @@ const GridWrapper = (props) => {
     const myData = React.useMemo(() => props.data, [])
     const initialState = { pageSize: props.pageSize, pageIndex:0, sortBy: [{ id: props.initialSortColumn, asc: true }] }
 
-      // Here, we can override the pageIndex
-      // regardless of the internal table state
-    //   const overrides = React.useMemo(() => ({
-    //     pageIndex: 1,
-    //   }))
-    
-    const mystate = useTableState(initialState)
-    
-      // You can use effects to observe changes to the state
-    //   React.useEffect(() => {
-    //     console.log('Page Size Changed!', initialState.pageSize)
-    //   }, [initialState.pageSize])
     return (        
-        <Grid columns={columns} data={myData} state={mystate}/>
+        <Grid columns={columns} data={myData} initialState={initialState}/>
     )
 }
 
@@ -112,15 +100,7 @@ function SelectColumnFilter({
                 {option}
                 </option>
             ))}
-        </select>
-        //Need investigate
-        // <Dropdown
-        //     options={dropObjs}
-        //     value={filterValue}
-        //     onChange={e => {
-        //     setFilter(e.target.value || undefined)
-        //     }}
-        // />
+        </select>        
     )
   }
 
@@ -162,7 +142,7 @@ function SliderColumnFilter({
   // This is a custom UI for our 'between' or number range
   // filter. It uses two number boxes and filters rows to
   // ones that have values between the two
-  function NumberRangeColumnFilter({
+function NumberRangeColumnFilter({
     column: { filterValue = [], preFilteredRows, setFilter, id },
   }) {
     const [min, max] = React.useMemo(() => {
@@ -235,8 +215,21 @@ filterGreaterThan.autoRemove = val => typeof val !== 'number'
 
 /////////////////////////////////////////////////
 
-const Grid = ({ columns, data }) => {
+const Grid = ({ columns, data, initialState}) => {
 
+    // Now we can get our table state from the hoisted table state tuple
+    const tableState = useTableState(initialState)
+    
+    const [{ pageIndex, pageSize }] = tableState
+
+      // Listen for changes in pagination and use the state to fetch our new data
+    // React.useEffect(
+    //     () => {
+    //     fetchData({ pageIndex, pageSize })
+    //     },
+    //     [fetchData, pageIndex, pageSize]
+    // )
+    
     const filterTypes = React.useMemo(
         () => ({
           // Add a new fuzzyTextFilterFn filter type.
@@ -275,7 +268,6 @@ const Grid = ({ columns, data }) => {
         pageOptions,
         pageCount,
         page,
-        state: [{ pageIndex, pageSize }],
         gotoPage,
         previousPage,
         nextPage,
@@ -289,6 +281,7 @@ const Grid = ({ columns, data }) => {
             data,
             defaultColumn, // Be sure to pass the defaultColumn option
             filterTypes,
+            state: tableState
         },
         useFilters, // useFilters!
         useFilters,
@@ -342,8 +335,8 @@ const Grid = ({ columns, data }) => {
             <Table.Header>
             {headerGroups.map(headerGroup => (
                 <Table.Row {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
-                    <Table.HeaderCell sorted={column.isSorted ? column.isSortedDesc ? "descending" : "ascending" : null}  {...column.getHeaderProps(column.getSortByToggleProps())}>                        
+                {headerGroup.headers.map(column => (                        
+                    <Table.HeaderCell {...column.getHeaderProps(column.getSortByToggleProps())}>                        
                         {column.render('Header')}
                         <div>{column.canFilter ? column.render('Filter') : null}</div>
                     </Table.HeaderCell>
@@ -391,19 +384,19 @@ const Grid = ({ columns, data }) => {
                 style={{ width: '100px' }}
             />
             </span>{' '}
-            <Dropdown
-                button
-                className='icon'
-                floating
-                labeled
-                icon='world'
-                options={[ { key: '3', text: '3', value: '3' },{ key: '5', text: '5', value: '5' }]}
-                search
+            <select
                 text={`Show ${pageSize}`}
                 value={pageSize}
-                onChange={(e, { name, value }) => setPageSize(Number(value))}
+                onChange={e => {
+                    setPageSize(Number(e.target.value))
+                }}
             >
-            </Dropdown>
+                {[ { key: '3', text: '3', value: '3' },{ key: '5', text: '5', value: '5' }].map((option, i) => (
+                    <option key={option.key} value={option.value}>
+                      Show  {option.value}
+                    </option>
+                ))}
+            </select>
         </div>
         </>
     )
@@ -413,5 +406,4 @@ const Grid = ({ columns, data }) => {
 export {
     GridWrapper
 }
-
 

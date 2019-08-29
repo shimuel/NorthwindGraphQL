@@ -153,12 +153,27 @@ namespace GraphQL_api.Schema
 
             Field<ListGraphType<OrderType>>(
                 "Orders",
+                arguments:  new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>>{ Name = "index" },
+                            new QueryArgument<NonNullGraphType<IntGraphType>>{ Name = "size" }),
                 resolve: context => {
-                     var tmp = uow.GetRepositoryAsync<Order>().GetListAsync(
-                        include: q => q.Include(j => j.Employee)
-                        .Include(k=>k.OrderDetails).ThenInclude(p=>p.Product).ThenInclude(p=>p.Category)                         
-                        .Include(k=>k.Customer).Include(k=>k.ShipViaNavigation)
-                     );                     
+                    var index = context.GetArgument<int>("index"); 
+                    var size = context.GetArgument<int>("size"); 
+
+                     System.Threading.Tasks.Task<IPaginate<Order>> tmp = null;
+                     if(index == 0 || size == 0){
+                        tmp = uow.GetRepositoryAsync<Order>().GetListAsync(
+                            include: q => q.Include(j => j.Employee)
+                            .Include(k=>k.OrderDetails).ThenInclude(p=>p.Product).ThenInclude(p=>p.Category)                         
+                            .Include(k=>k.Customer).Include(k=>k.ShipViaNavigation)
+                        );                     
+                     }else{
+                         tmp = uow.GetRepositoryAsync<Order>().GetListAsync(
+                            index : index, size:size,
+                            include: q => q.Include(j => j.Employee)
+                            .Include(k=>k.OrderDetails).ThenInclude(p=>p.Product).ThenInclude(p=>p.Category)                         
+                            .Include(k=>k.Customer).Include(k=>k.ShipViaNavigation)
+                        );                     
+                     }
                     return tmp.Result.Items;
             }); 
 

@@ -1,18 +1,18 @@
 import { gql } from "apollo-boost";
 
 const GET_ORDERS = gql`    
-    {
-        orders{
+    query($index:Int!, $size:Int!) {
+        orders(index:$index, size:$size){
             customer{
                 companyName
             }
             orderDetails{
-                product{
-                    productName
-                    category{
+            product{
+                productName
+                category{
                     categoryName
-                    }
                 }
+            }
                 quantity
             }
             employee{
@@ -23,7 +23,7 @@ const GET_ORDERS = gql`
             }
             orderDate
         }
-    }    
+    }
 `;
 
 const AUTH_USER = gql`
