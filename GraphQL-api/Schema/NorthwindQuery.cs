@@ -153,8 +153,10 @@ namespace GraphQL_api.Schema
 
             Field<ListGraphType<OrderType>>(
                 "Orders",
-                arguments:  new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>>{ Name = "index" },
-                            new QueryArgument<NonNullGraphType<IntGraphType>>{ Name = "size" }),
+                arguments:  new QueryArguments(
+                        new QueryArgument<IntGraphType>{ Name = "index" },
+                        new QueryArgument<IntGraphType>{ Name = "size" }
+                ),
                 resolve: context => {
                     var index = context.GetArgument<int>("index"); 
                     var size = context.GetArgument<int>("size"); 
