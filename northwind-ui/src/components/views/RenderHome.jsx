@@ -18,21 +18,21 @@ const OrdersView = () => {
     columns.set("companyName", {
               header: 'First Name',
               accessor: 'companyName',
-              isFilter:false,
-              filterType:"",
+              isFilter:true,
+              filterType:"containsFilter",
               isSortable:false,
               type:"string"
             })
     columns.set("shipVia", {
               header: 'Last Name',
               accessor: 'shipVia',
-              isFilter:false,
-              filterType:"",
+              minWidth: 150,
+              isFilter:true,
+              filterType:"SelectColumnFilter",
               isSortable:false,
-              type:"number"
+              type:"string"
     })
-        
-      
+
     const extractData = (previousData, nextData ) => {
 
       if(nextData){
