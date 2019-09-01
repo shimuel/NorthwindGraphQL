@@ -1,7 +1,33 @@
 import { gql } from "apollo-boost";
 
+const GET_ORDERS_COUNT = gql`    
+    query {
+        orders {
+            customer{
+                companyName
+            }
+            orderDetails{
+            product{
+                productName
+                category{
+                    categoryName
+                }
+            }
+                quantity
+            }
+            employee{
+                firstName
+            }
+            shipViaNavigation{
+                companyName
+            }
+            orderDate
+        }
+    }
+`;
+
 const GET_ORDERS = gql`    
-    query($index:Int!, $size:Int!) {
+    query($index:Int, $size:Int) {
         orders(index:$index, size:$size){
             customer{
                 companyName

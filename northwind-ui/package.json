@@ -13,6 +13,7 @@
     "fetch": "^1.1.0",
     "graphql": "^14.5.3",
     "graphql-anywhere": "^4.2.4",
+    "match-sorter": "^4.0.1",
     "qs": "^6.8.0",
     "react": "^16.9.0",
     "react-bootstrap": "^1.0.0-beta.11",
