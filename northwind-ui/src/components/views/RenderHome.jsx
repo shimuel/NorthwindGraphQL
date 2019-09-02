@@ -2,7 +2,8 @@ import React from "react";
 import "../../App.css";
 import { useQuery } from "@apollo/react-hooks";
 import  { GET_ORDERS } from '../../graphql/queries'
-import  { GridWrapper, EDIT_MODE, EDITMODE_METADATA } from '../Grid'
+import  { EDIT_MODE, EDITMODE_METADATA } from '../grid/GridExtn'
+import  {GridWrapper} from '../grid/GridWrapper'
 
 const OrdersView = () => {
 
