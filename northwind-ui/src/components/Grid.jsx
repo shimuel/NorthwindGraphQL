@@ -18,78 +18,21 @@ import matchSorter from 'match-sorter'
 import { useQuery } from "@apollo/react-hooks";
 
 const Grid = ({
-      gridCols, 
+      columns, 
       gridColsMetaData,
       data, 
       initialState,  
       fetchData, 
       loading,
-      pageCount:controlledPageCount
+      pageCount:controlledPageCount,
+      filterTypes
     }) => {
      
-    const tableState = useTableState(initialState)
-    const [{ pageIndex, pageSize }] = tableState
-      
-    //A. Listen for changes in pagination and use the state to fetch our new data
-    React.useEffect(
-      () => {
-        fetchData({ pageIndex, pageSize })
-      },
-      [pageIndex, pageSize]
-    )
-    
-    //C.
-    const columns = React.useMemo(
-        () => [{
-            // Let's make a column for selection
-            id: 'selection',
-            // The header can use the table's getToggleAllRowsSelectedProps method
-            // to render a checkbox
-            Header: ( getToggleAllRowsSelectedProps ) => {
-              //<input type="checkbox" {...getToggleAllRowsSelectedProps()} />
+    //const tableState = useTableState(initialState)
+    const [{ pageIndex, pageSize }] = initialState
               
-              return  <div>
-                        <input type="checkbox" />
-                      </div>
-            },
-            // The cell can use the individual row's getToggleRowSelectedProps method
-            // to the render a checkbox
-            Cell: ({ row }) => (
-              <div>
-                <input type="checkbox"/>
-              </div>
-            ),
-          },
-          {
-            Header: ' ',
-            columns: gridCols,
-          }
-        ],
-        []
-    )            
-   //B.
-  const filterTypes = React.useMemo(
-    () => ({
-      // Add a new fuzzyTextFilterFn filter type.
-      //fuzzyText: fuzzyTextFilterFn,
-      // Or, override the default text filter to use
-      // "startWith"
-      containsFilter: (rows, id, filterValue) => {
-        return rows.filter(row => {
-          const rowValue = row.values[id]
-          const found = rowValue !== undefined
-            ? String(rowValue)
-                .toLowerCase()
-                .indexOf(String(filterValue).toLowerCase()) > -1
-            : true
-
-            return found
-        })
-      },
-    }),
-    []
-  )
-  //C.
+   
+  //D.       
   const defaultColumn = React.useMemo(
     () => ({
       // Let's set up our default Filter UI
@@ -97,9 +40,6 @@ const Grid = ({
     }),
     []
   )
-    
-  //D.       
-         
   // Use the state and functions returned from useTable to build your UI
   const {
       getTableProps,
@@ -118,7 +58,7 @@ const Grid = ({
       {
         columns,
         data,
-        state:tableState,
+        state:initialState,
         defaultColumn, //// Let's set up our default Filter UI
         manualPagination: true, // Tell the usePagination
         // hook that we'll handle our own data fetching
@@ -150,19 +90,7 @@ const Grid = ({
   return (
       <>
         <pre>
-            <code>
-            {JSON.stringify(
-                {
-                pageIndex,
-                pageSize,
-                pageCount,
-                canNextPage,
-                canPreviousPage,
-                },
-                null,
-                2
-            )}
-            </code>
+        <code>{JSON.stringify(initialState, null, 2)}</code>
         </pre>
         <Table fixed celled selectable {...getTableProps()}>
             <Table.Header>
@@ -252,10 +180,22 @@ const Grid = ({
 
 const GridWrapper = (props) => {
 
-  //const myData = React.useMemo(() => props.data, [])
   const {gridCols, onDataRecieved, initState, fetchMore, queryParams, rowCount} = props
   const state = initState//{ pageSize: 3,pageIndex:0, sortBy: [{ id: 'companyName', asc: true }] }
-         
+  
+  //Setup State
+  const tableState = useTableState(state)
+  const [{ pageIndex, pageSize }] = tableState
+    
+  //A. Listen for changes in pagination and use the state to fetch our new data
+  React.useEffect(
+    () => {
+      fetchData({ pageIndex, pageSize })
+    },
+    [pageIndex, pageSize]
+  )
+
+  //Setup Grid Column metadata
   let cols = []
   gridCols.forEach((v) => {    
     const {isFilter, filterType, isSortable, type, header, accessor} =  v      
@@ -288,7 +228,43 @@ const GridWrapper = (props) => {
     cols.push(c)
   })
 
+  //Now setup the Columns
+  const gridColumns = React.useMemo(
+    () => [
+      {
+        Header: ' ',
+        columns: cols,
+      }
+    ],
+    []
+)   
 
+///////////////////////////////////////////////////
+
+//Now setup the custom filters
+const filterTypes = React.useMemo(
+  () => ({
+    // Add a new fuzzyTextFilterFn filter type.
+    //fuzzyText: fuzzyTextFilterFn,
+    // Or, override the default text filter to use
+    // "startWith"
+    containsFilter: (rows, id, filterValue) => {
+      return rows.filter(row => {
+        const rowValue = row.values[id]
+        const found = rowValue !== undefined
+          ? String(rowValue)
+              .toLowerCase()
+              .indexOf(String(filterValue).toLowerCase()) > -1
+          : true
+
+          return found
+      })
+    }
+  }),
+  []
+)
+  
+/////////////////////////////DATA FETCHING / PAGING /////////////////////////////////
   // We'll start our table without any data
   const [data, setData] = React.useState([])
   const [loading, setLoading] = React.useState(false)
@@ -326,13 +302,14 @@ const GridWrapper = (props) => {
     height:30px;
   `
   return (      
-      <Grid gridCols={cols} 
+      <Grid columns={gridColumns} 
             gridColsMetaData = {gridCols}
             data ={data} 
-            initialState={state}             
+            initialState={tableState}             
             fetchData={fetchData} 
             loading={loading}            
-            pageCount={rowCount}/>    
+            pageCount={rowCount}
+            filterTypes={filterTypes}/>    
   )
 } /*GRIDWRAPPER CLASS ENDS */ 
 

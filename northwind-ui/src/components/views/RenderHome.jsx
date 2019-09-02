@@ -27,7 +27,7 @@ const OrdersView = () => {
               header: 'Last Name',
               accessor: 'shipVia',
               minWidth: 150,
-              isFilter:true,
+              isFilter:false,
               filterType:"SelectColumnFilter",
               isSortable:false,
               type:"string"
