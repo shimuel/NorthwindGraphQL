@@ -99,7 +99,15 @@ const Grid = ({
                   {headerGroup.headers.map(column => {
                     return  <Table.HeaderCell  {...column.getHeaderProps()}>                        
                               {/* <div {...column.getSortByToggleProps()}> */}
-                                  {column.render('Header')}
+                                  {!column.columns ? column.render('Header'):
+                                  <Menu floated='right' pagination>
+                                      <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}> 
+                                          <Icon name='chevron left' />
+                                      </Menu.Item>
+                                      <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
+                                          <Icon name='chevron right' />
+                                      </Menu.Item>
+                                  </Menu>}
                                   {/* <span>
                                     {column.isSorted
                                       ? column.isSortedDesc
@@ -131,14 +139,14 @@ const Grid = ({
             <Table.Footer>
                 <Table.Row>
                     <Table.HeaderCell colSpan='3'>
-                        <Menu floated='right' pagination>
+                        {/* <Menu floated='right' pagination>
                             <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}> 
                                 <Icon name='chevron left' />
                             </Menu.Item>
                             <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
                                 <Icon name='chevron right' />
                             </Menu.Item>
-                        </Menu>
+                        </Menu> */}
                     </Table.HeaderCell>
                 </Table.Row>
             </Table.Footer>
@@ -232,7 +240,7 @@ const GridWrapper = (props) => {
   const gridColumns = React.useMemo(
     () => [
       {
-        Header: ' ',
+        Header: ' ORDER ',
         columns: cols,
       }
     ],
