@@ -12,6 +12,7 @@ const OrdersView = () => {
     columns.set("orderDate", {
               header: 'Order Date',
               accessor: 'orderDate',
+              minWidth: 150,
               isFilter:false,
               filterType:"",
               editor:'EditableTextCell',
@@ -22,10 +23,11 @@ const OrdersView = () => {
     columns.set("companyName", {
               header: 'First Name',
               accessor: 'companyName',
+              minWidth: 150,
               isFilter:true,
               filterType:"containsFilter",
               editor:'EditableTextCell',
-              isSortable:false,              
+              isSortable:true,              
               show:true,
               type:"string"
             })
@@ -36,7 +38,7 @@ const OrdersView = () => {
               isFilter:false,
               filterType:"SelectColumnFilter",
               editor:'EditableListCell',
-              isSortable:false,
+              isSortable:true,
               show:true,
               type:"string"
     })
@@ -98,7 +100,7 @@ const OrdersView = () => {
                     initialSortColumn='companyName' 
                     fetchMore={fetchData}
                     onDataRecieved={extractData} 
-                    initState ={ {pageSize: 3,pageIndex:0, sortBy: [{ id: 'companyName', asc: true }]}}
+                    initState ={ {pageSize: 3,pageIndex:0}}
                     rowCount={data.orders.length}/>            
         </div>
     )
