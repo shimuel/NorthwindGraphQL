@@ -2,17 +2,21 @@ import React from "react";
 import "../../App.css";
 import { useQuery } from "@apollo/react-hooks";
 import  { GET_ORDERS } from '../../graphql/queries'
-import  { GridWrapper } from '../Grid'
+import  { GridWrapper, EDIT_MODE, EDITMODE_METADATA } from '../Grid'
 
 const OrdersView = () => {
 
     let columns = new Map();
+
+    columns.set(EDIT_MODE,EDITMODE_METADATA())//To track a cols edit state// A checkbox for activating a edit    
     columns.set("orderDate", {
               header: 'Order Date',
               accessor: 'orderDate',
               isFilter:false,
               filterType:"",
-              isSortable:false,
+              editor:'EditableTextCell',
+              isSortable:false,              
+              show:true,
               type:"date"
             })
     columns.set("companyName", {
@@ -20,7 +24,9 @@ const OrdersView = () => {
               accessor: 'companyName',
               isFilter:true,
               filterType:"containsFilter",
-              isSortable:false,
+              editor:'EditableTextCell',
+              isSortable:false,              
+              show:true,
               type:"string"
             })
     columns.set("shipVia", {
@@ -29,7 +35,9 @@ const OrdersView = () => {
               minWidth: 150,
               isFilter:false,
               filterType:"SelectColumnFilter",
+              editor:'EditableListCell',
               isSortable:false,
+              show:true,
               type:"string"
     })
 

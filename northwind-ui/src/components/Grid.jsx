@@ -17,29 +17,36 @@ import {
 import matchSorter from 'match-sorter'
 import { useQuery } from "@apollo/react-hooks";
 
+const EDIT_MODE = "editMode"
+const EDITMODE_METADATA = () => {
+  return {
+    header: '',
+    accessor: EDIT_MODE,
+    isFilter:false,
+    filterType:"",
+    isSortable:false,
+    type:"bool",
+    editor:'EditableSelectionCell',
+    show:true
+  }
+}
+
 const Grid = ({
       columns, 
       gridColsMetaData,
       data, 
-      initialState,  
-      fetchData, 
+      initialState,        
       loading,
       pageCount:controlledPageCount,
-      filterTypes
+      filterTypes,
+      updateRow,
+      disablePageResetOnDataChange,
+      defaultColumn
     }) => {
      
     //const tableState = useTableState(initialState)
-    const [{ pageIndex, pageSize }] = initialState
-              
-   
-  //D.       
-  const defaultColumn = React.useMemo(
-    () => ({
-      // Let's set up our default Filter UI
-      Filter: DefaultColumnFilter,
-    }),
-    []
-  )
+  const [{ pageIndex, pageSize }] = initialState
+             
   // Use the state and functions returned from useTable to build your UI
   const {
       getTableProps,
@@ -65,7 +72,9 @@ const Grid = ({
         // This means we'll also have to provide our own
         // pageCount.
         filterTypes,
-        pageCount: controlledPageCount,         
+        pageCount: controlledPageCount,      
+        disablePageResetOnDataChange,                
+        updateRow   
       },           
       useFilters,
       useSortBy,
@@ -74,11 +83,16 @@ const Grid = ({
  
   const myRowFunc = (row) => {        
     return <Table.Row {...row.getRowProps()}>
-                {row.cells.map(cell => {
+                {row.cells.map((cell) => {
+
+                    const inEditState = cell.column.id !== EDIT_MODE && cell.row.cells[0].value !== true
+                    
                     return (
                         <Table.Cell {...cell.getCellProps()}>
                             {
-                                cell.render('Cell')
+                                 !inEditState === false ? cell.render(()=>{                                  
+                                    return <span>{cell.value}</span>
+                                }) : cell.render('Cell')
                             }                                                                    
                         </Table.Cell>
                     )
@@ -89,9 +103,9 @@ const Grid = ({
     // Render the UI for your table
   return (
       <>
-        <pre>
+        {/* <pre>
         <code>{JSON.stringify(initialState, null, 2)}</code>
-        </pre>
+        </pre> */}
         <Table fixed celled selectable {...getTableProps()}>
             <Table.Header>
               {headerGroups.map(headerGroup => (
@@ -138,16 +152,7 @@ const Grid = ({
             </Table.Body>
             <Table.Footer>
                 <Table.Row>
-                    <Table.HeaderCell colSpan='3'>
-                        {/* <Menu floated='right' pagination>
-                            <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}> 
-                                <Icon name='chevron left' />
-                            </Menu.Item>
-                            <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
-                                <Icon name='chevron right' />
-                            </Menu.Item>
-                        </Menu> */}
-                    </Table.HeaderCell>
+                    <Table.HeaderCell colSpan='3'></Table.HeaderCell>
                 </Table.Row>
             </Table.Footer>
         </Table>
@@ -206,10 +211,27 @@ const GridWrapper = (props) => {
   //Setup Grid Column metadata
   let cols = []
   gridCols.forEach((v) => {    
-    const {isFilter, filterType, isSortable, type, header, accessor} =  v      
+    const {isFilter, filterType, isSortable, type, header, accessor,editor, show} =  v      
     let c = {
       Header:header, 
       accessor
+    }
+   
+    c.show = show
+
+    switch(editor) {
+
+      case "EditableListCell":
+          c.Cell = EditableListCell        
+          break;
+      case "EditableTextCell":
+          c.Cell = EditableTextCell          
+          break;  
+      case "EditableSelectionCell":
+          c.Cell = EditableCheckboxCell
+          break;  
+      default:        
+        break;        
     }
 
     if(isFilter){
@@ -247,6 +269,19 @@ const GridWrapper = (props) => {
     []
 )   
 
+const defaultReadOnlyColumn = React.useMemo(
+  () => ({
+    // Let's set up our default Filter UI
+    Filter: DefaultColumnFilter,
+    Cell: (row ) => {
+      
+    if(row.cell.id !== EDIT_MODE)      
+      return <span>{row.cell.value}</span>
+    }
+  }),
+  []
+)
+
 ///////////////////////////////////////////////////
 
 //Now setup the custom filters
@@ -271,13 +306,14 @@ const filterTypes = React.useMemo(
   }),
   []
 )
-  
+
 /////////////////////////////DATA FETCHING / PAGING /////////////////////////////////
   // We'll start our table without any data
   const [data, setData] = React.useState([])
   const [loading, setLoading] = React.useState(false)
   const [pageCount, setPageCount] = React.useState(0)
-  
+  const [masterData, setMasterData] = React.useState([]) //for r
+
   const fetchData = React.useCallback(({ pageSize, pageIndex }) => {
       // This will get called when the table needs new data
       // You could fetch your data from literally anywhere,
@@ -291,7 +327,8 @@ const filterTypes = React.useMemo(
       const endRow = startRow + pageSize
       const pa = {...queryParams, pageIndex, pageSize}
       fetchMore(pa).then((nextData) => {
-        let d =onDataRecieved(nextData)
+        setMasterData(nextData)
+        let d = onDataRecieved(nextData)
         //d = d.slice(startRow, endRow)
         setData(d)    
       });
@@ -304,6 +341,48 @@ const filterTypes = React.useMemo(
       setLoading(false)
   }, [])
   
+  /////////////////////////////DATA EDITING /////////////////////////////////
+  // We need to keep the table from resetting the pageIndex when we
+  // Update data. So we can keep track of that flag with a ref.
+  const skipPageResetRef = React.useRef(false)
+
+  // When our cell renderer calls updateRow, we'll use
+  // the rowIndex, columnID and new value to update the
+  // original data
+  const updateRow = (rowIndex, columnID, value) => {
+    // We also turn on the flag to not reset the page
+    console.log(`${rowIndex} ${columnID} ${value}`)
+    skipPageResetRef.current = true
+    setData(old =>
+      old.map((row, index) => {
+        if (index === rowIndex) {
+
+          let obj = {
+            ...old[rowIndex],
+            [columnID]: value,
+          }
+
+          if(columnID !== EDIT_MODE)
+            obj = {...obj, [EDIT_MODE]: false}
+ 
+          return obj
+        }
+        return row
+      })
+    )
+  }
+
+  // After data chagnes, we turn the flag back off
+  // so that if data actually changes when we're not
+  // editing it, the page is reset
+  React.useEffect(() => {
+    skipPageResetRef.current = false
+  }, [data])
+
+  // Let's add a data resetter/randomizer to help
+  // illustrate that flow...
+  //const resetData = () => setData(originalData)
+
   const GridStyles = styled.div`
     padding: 1rem;
     border: 1px red solid;
@@ -312,12 +391,16 @@ const filterTypes = React.useMemo(
   return (      
       <Grid columns={gridColumns} 
             gridColsMetaData = {gridCols}
+            defaultColumn={defaultReadOnlyColumn}
             data ={data} 
             initialState={tableState}             
             fetchData={fetchData} 
             loading={loading}            
             pageCount={rowCount}
-            filterTypes={filterTypes}/>    
+            filterTypes={filterTypes}
+            updateRow={updateRow}
+            disablePageResetOnDataChange={skipPageResetRef.current}
+      />    
   )
 } /*GRIDWRAPPER CLASS ENDS */ 
 
@@ -382,9 +465,105 @@ function SelectColumnFilter({
     </select>
   )
 }
+
+/*************************EDITABLITY ****************************************/
+
+// Create an editable cell renderer
+const EditableTextCell = ({
+  cell: { value: initialValue },
+  row: { index },
+  column: { id },
+  updateRow, // This is a custom function that we supplied to our table instance
+}) => {
+  // We need to keep and update the state of the cell normally
+  const [value, setValue] = React.useState(initialValue)
+
+  const onChange = e => {
+    setValue(e.target.value)
+  }
+
+  // We'll only update the external data when the input is blurred
+  const onBlur = () => {
+    updateRow(index, id, value)
+  }
+
+  // If the initialValue is changed externall, sync it up with our state
+  React.useEffect(() => {
+    setValue(initialValue)
+  }, [initialValue])
+
+  return <input value={value} onChange={onChange} onBlur={onBlur} />
+}
+
+// Create an editable cell renderer
+const EditableListCell = ({
+  cell: { value: initialValue },
+  row: { index },
+  column: { id },
+  data: { data },
+  updateRow, // This is a custom function that we supplied to our table instance
+}) => {
+
+  data = [{key:'Federal Shipping', value:'Federal Shipping'},
+          {key:'Speedy Express', value:'Speedy Express'},
+          {key:'United Package', value:'United Package'}
+        ]
+  // We need to keep and update the state of the cell normally
+  const [value, setValue] = React.useState(initialValue)
+
+  const onChange = e => {
+    setValue(e.target.value)
+  }
+
+  // We'll only update the external data when the input is blurred
+  const onBlur = () => {
+    updateRow(index, id, value)
+  }
+
+  // If the initialValue is changed externall, sync it up with our state
+  React.useEffect(() => {
+    setValue(initialValue)
+  }, [initialValue])
+
+  return <select
+            value={value}
+            onChange={onChange} onBlur={onBlur}
+          >
+            {data.map(v => (
+              <option key={v.key} value={v.value}>
+                 {v.value}
+              </option>
+            ))}
+          </select>
+}
+
+const EditableCheckboxCell = ({
+  cell: { value: initialValue },
+  row: { index },
+  column: { id },
+  updateRow // This is a custom function that we supplied to our table instance
+}) => {
+  // We need to keep and update the state of the cell normally
+  const [value, setValue] = React.useState(false)
+
+  const onChange = e => {
+    e.stopPropagation()
+    updateRow(index, id, e.target.checked)
+  }
+
+  // If the initialValue is changed externall, sync it up with our state
+  React.useEffect(() => {
+    setValue(initialValue)
+  }, [initialValue])
+
+  return <input type="checkbox" onChange={onChange} />
+}
+
 /* ALL ABOVE Functions OUTSIDE GRIDWRAPPER & GRID */
 
 export {
-    GridWrapper
+    GridWrapper,
+    EDIT_MODE,
+    EDITMODE_METADATA
 }
 
