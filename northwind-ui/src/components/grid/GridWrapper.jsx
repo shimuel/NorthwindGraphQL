@@ -1,21 +1,23 @@
 import React from 'react';
 import styled from "styled-components";
+// import {Container, Icon, Grid as semGrid, GridColumn} from 'semantic-ui-react'
 import "../../App.css"
 import {
   useTableState
 } from 'react-table'
+import {Grid} from './Grid'  
 import {
+  HiddenCell,
   SelectColumnFilter,
   DefaultColumnFilter,
   EditableTextCell,
   EditableListCell,
   EditableCheckboxCell,
   EDIT_MODE} from './GridExtn'
-import {Grid} from './Grid'  
 
 const GridWrapper = (props) => {
 
-  const { gridCols, onDataRecieved, initState, fetchMore, queryParams, rowCount } = props
+  const { gridCols, onDataRecieved, initState, fetchMore, queryParams, rowCount, newItemCallback } = props
   const state = initState//{ pageSize: 3,pageIndex:0, sortBy: [{ id: 'companyName', asc: true }] }
 
   //Setup State
@@ -58,6 +60,9 @@ const GridWrapper = (props) => {
         break;
       case "EditableSelectionCell":
         c.Cell = EditableCheckboxCell
+        break;
+      case "HiddenCell":
+        c.Cell = HiddenCell
         break;
       default:
         break;
@@ -102,11 +107,11 @@ const GridWrapper = (props) => {
     () => ({
       // Let's set up our default Filter UI
       Filter: DefaultColumnFilter,
-      Cell: (row) => {
+      // Cell: (row) => {
 
-        if (row.cell.id !== EDIT_MODE)
-          return <span>{row.cell.value}</span>
-      }
+      //   //if (row.cell.id !== EDIT_MODE)
+      //     return <span>{row.cell.value}</span>
+      // }
     }),
     []
   )
@@ -156,12 +161,15 @@ const GridWrapper = (props) => {
     const startRow = pageSize * pageIndex
     const endRow = startRow + pageSize
     const pa = { ...queryParams, pageIndex, pageSize }
-    fetchMore(pa).then((nextData) => {
-      setMasterData(nextData)
+    fetchMore(pa).then((nextData) => {      
       let d = onDataRecieved(nextData)
-      // d = d.slice(startRow, endRow)
+      // d = d.slice(startRow, endRow)      
       d = d.slice(0, 3)
+      d =  d.map(i => {        
+        return {...i, [EDIT_MODE]: false}
+      })
       setData(d)
+      setMasterData(d)
     });
 
 
@@ -177,38 +185,65 @@ const GridWrapper = (props) => {
   // Update data. So we can keep track of that flag with a ref.
   const skipPageResetRef = React.useRef(false)
 
+    // Let's add a data resetter/randomizer to help
+  // illustrate that flow...
+  const rollbackChanges = () => {
+    setData(masterData)
+  }
+
+  const setEditMode = (rowIndex, columnID) => {
+
+    setData(old =>
+      old.map((row, index) => {
+        
+        //console.log(`before...${JSON.stringify(row)}`)
+        let o = {
+          ...old[index],
+          [columnID]: index === rowIndex ? true:false,
+        }
+        //console.log(`before...${JSON.stringify(row)}`)
+        return o
+      })
+    );   
+  }
+
+  const addRow = () => {              
+        //turn of other edits
+        skipPageResetRef.current = true
+        setEditMode(-1, EDIT_MODE)                        
+        setData(oldItems => [...oldItems, {...newItemCallback(), [EDIT_MODE]: true}]);   
+  }
+
+  const deleteRow = (rowIndex) => {
+
+  }
+
   // When our cell renderer calls updateRow, we'll use
   // the rowIndex, columnID and new value to update the
   // original data
   const updateRow = (rowIndex, columnID, value) => {
     // We also turn on the flag to not reset the page
-    console.log(`${rowIndex} ${columnID} ${value}`)
+    //console.log(`${rowIndex} ${columnID} ${value}`)
+    
     skipPageResetRef.current = true
-    setData(old =>
-      old.map((row, index) => {
-        if (index === rowIndex) {
-          let obj = null
-          if (columnID !== EDIT_MODE) {
-            obj = {
+    
+    if(EDIT_MODE === columnID){      
+      setEditMode(rowIndex, columnID)
+    } else {      
+      setData(old =>
+        old.map((row, index) => {
+          if (index === rowIndex) {
+            let obj = {
               ...old[rowIndex],
               [columnID]: value,
-              [EDIT_MODE]: false
             }
-          } else {
-            obj = {
-              ...old[rowIndex],
-              [columnID]: value,
-              [EDIT_MODE]: value
-            }
+            return obj
           }
-          console.log(JSON.stringify(obj))
-          return obj
-        }
-        return row
-      })
-    )
+          return row
+        })
+      )
+    }    
   }
-
   // After data chagnes, we turn the flag back off
   // so that if data actually changes when we're not
   // editing it, the page is reset
@@ -236,6 +271,11 @@ const GridWrapper = (props) => {
       pageCount={rowCount}
       filterTypes={filterTypes}
       updateRow={updateRow}
+      addRow={addRow}
+      newGridIdItem={newItemCallback}
+      setEditMode={setEditMode}
+      deleteRow={deleteRow}
+      rollbackChanges={rollbackChanges}
       disablePageResetOnDataChange={skipPageResetRef.current}
     />
   )

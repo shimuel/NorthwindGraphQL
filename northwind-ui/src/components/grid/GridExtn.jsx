@@ -1,4 +1,6 @@
 import React from 'react';
+import "../../App.css"
+import {Container, Icon, Grid, GridColumn} from 'semantic-ui-react'
 import styled from "styled-components";
 import "../../App.css"
 import matchSorter from 'match-sorter'
@@ -15,7 +17,7 @@ const EDITMODE_METADATA = () => {
     filterType: "",
     isSortable: false,
     type: "bool",
-    editor: '',
+    editor: 'HiddenCell',
     show: true
   }
 }
@@ -81,13 +83,59 @@ const DefaultColumnFilter = ({
   }
   
   /*************************EDITABLITY ****************************************/
+    // Create an editable cell renderer
+  const HiddenCell = ({
+    cell: { value: initialValue },
+    row: { index },
+    column: { id },
+    updateRow, // This is a custom function that we supplied to our table instance
+    addRow,
+    newGridIdItem,      
+    setEditMode,
+    deleteRow,
+    rollbackChanges
+
+  }) => {
+    // We need to keep and update the state of the cell normally
+    const [value, setValue] = React.useState(initialValue)
   
+    const onSave = e => {
+      console.log('Saving...')
+      updateRow(index, EDIT_MODE, false)
+    }
+    
+    const onCancel = e => {      
+      console.log('Cancelled...')
+      setEditMode(-1, EDIT_MODE, false)
+    }
+
+    // If the initialValue is changed externall, sync it up with our state
+    React.useEffect(() => {
+      setValue(initialValue)
+    }, [initialValue])
+
+    return <Container><Grid>
+        <GridColumn>
+          <Icon className='x icon' onClick={onCancel}></Icon>
+        </GridColumn>
+        <GridColumn>
+          <Icon className='save icon' onClick={onSave}></Icon>
+        </GridColumn>
+    </Grid></Container>
+  }
+
+
   // Create an editable cell renderer
   const EditableTextCell = ({
     cell: { value: initialValue },
     row: { index },
     column: { id },
     updateRow, // This is a custom function that we supplied to our table instance
+    addRow,
+    newGridIdItem,      
+    setEditMode,
+    deleteRow,
+    rollbackChanges
   }) => {
     // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState(initialValue)
@@ -98,6 +146,7 @@ const DefaultColumnFilter = ({
   
     // We'll only update the external data when the input is blurred
     const onBlur = () => {
+      console.log(`Update...${index}, ${id}, ${value}`)
       updateRow(index, id, value)
     }
   
@@ -116,6 +165,11 @@ const DefaultColumnFilter = ({
     column: { id },
     data: { data },
     updateRow, // This is a custom function that we supplied to our table instance
+    addRow,
+    newGridIdItem,      
+    setEditMode,
+    deleteRow,
+    rollbackChanges
   }) => {
   
     data = [{ key: 'Federal Shipping', value: 'Federal Shipping' },
@@ -131,6 +185,7 @@ const DefaultColumnFilter = ({
   
     // We'll only update the external data when the input is blurred
     const onBlur = () => {
+      console.log(`Update...${index}, ${id}, ${value}`)
       updateRow(index, id, value)
     }
   
@@ -155,13 +210,19 @@ const DefaultColumnFilter = ({
     cell: { value: initialValue },
     row: { index },
     column: { id },
-    updateRow // This is a custom function that we supplied to our table instance
+    updateRow, // This is a custom function that we supplied to our table instance
+    addRow,
+    newGridIdItem,      
+    setEditMode,
+    deleteRow,
+    rollbackChanges
   }) => {
     // We need to keep and update the state of the cell normally
     const [value, setValue] = React.useState()
   
     const onChange = e => {
       e.stopPropagation()
+      console.log(`Update...${index}, ${id}, ${e.target.checked}`)
       updateRow(index, id, e.target.checked)
     }
   
@@ -173,7 +234,8 @@ const DefaultColumnFilter = ({
     return <input type="checkbox" onChange={onChange} />
   }
   
-  export {    
+  export {  
+    HiddenCell,  
     SelectColumnFilter,
     DefaultColumnFilter,
     EditableTextCell,

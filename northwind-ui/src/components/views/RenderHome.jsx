@@ -8,8 +8,7 @@ import  {GridWrapper} from '../grid/GridWrapper'
 const OrdersView = () => {
 
     let columns = new Map();
-
-    columns.set(EDIT_MODE,EDITMODE_METADATA())//To track a cols edit state// A checkbox for activating a edit    
+    
     columns.set("orderDate", {
               header: 'Order Date',
               accessor: 'orderDate',
@@ -28,7 +27,7 @@ const OrdersView = () => {
               isFilter:true,
               filterType:"containsFilter",
               editor:'EditableTextCell',
-              isSortable:true,              
+              isSortable:false,              
               show:true,
               type:"string"
             })
@@ -43,6 +42,7 @@ const OrdersView = () => {
               show:true,
               type:"string"
     })
+    columns.set(EDIT_MODE,EDITMODE_METADATA())//To track a cols edit state// A checkbox for activating a edit    
 
     const extractData = (previousData, nextData ) => {
 
@@ -71,6 +71,9 @@ const OrdersView = () => {
       }
     }
 
+  const addData = () => {
+    return{companyName:"test",orderDate:"", shipVia:""}    
+  }
   const fetchData = async  (p) =>{
       return fetchMore({
         variables: {index:p.pageIndex, size:p.pageSize},
@@ -102,7 +105,8 @@ const OrdersView = () => {
                     fetchMore={fetchData}
                     onDataRecieved={extractData} 
                     initState ={ {pageSize: 3,pageIndex:0}}
-                    rowCount={data.orders.length}/>            
+                    rowCount={data.orders.length}
+                    newItemCallback={addData}/>            
         </div>
     )
 }

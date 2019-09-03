@@ -1,15 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from "styled-components";
 import "../../App.css"
-import { Table, Icon, Label, Menu, Dropdown } from 'semantic-ui-react'
-import {
-  SelectColumnFilter,
-  DefaultColumnFilter,
-  EditableTextCell,
-  EditableListCell,
-  EditableCheckboxCell,
-  EDIT_MODE,
-  EDITMODE_METADATA} from './GridExtn'
+import { Table, Icon, Label, Menu, Dropdown, Button } from 'semantic-ui-react'
+import  { EDIT_MODE } from './GridExtn'
 import {
   useTable,
   useGroupBy,
@@ -32,13 +25,17 @@ const Grid = ({
   initialState,
   loading,
   pageCount: controlledPageCount,
-  filterTypes,
-  updateRow,
+  filterTypes,  
   disablePageResetOnDataChange,
-  defaultColumn
+  defaultColumn,
+  updateRow,
+  addRow,
+  newGridIdItem,
+  setEditMode,
+  deleteRow,
+  rollbackChanges
 }) => {
 
-  //const tableState = useTableState(initialState)
   const [{ pageIndex, pageSize }] = initialState
 
   // Use the state and functions returned from useTable to build your UI
@@ -68,53 +65,42 @@ const Grid = ({
       filterTypes,
       pageCount: controlledPageCount,
       disablePageResetOnDataChange,
-      updateRow
+      updateRow,
+      addRow,
+      newGridIdItem,      
+      setEditMode,
+      deleteRow,
+      rollbackChanges
     },
     useFilters,
     useSortBy,
     usePagination,
+    useRowSelect
   )
 
   const myRowFunc = (row) => {
     return <Table.Row {...row.getRowProps()}>
-      {row.cells.map((cell) => {
-
-        if (cell.column.id !== EDIT_MODE) {
-          const inEditState = /*cell.column.id !== EDIT_MODE &&*/ cell.row.cells[0].value !== true
+      {row.cells.map((cell) => {        
+        //console.log(`EDIT_MODE ${EDIT_MODE} ${cell.row.original.editMode} ${cell.value}`)
+        //if (cell.column.id !== EDIT_MODE) {
+          const inEditState = cell.row.original.editMode === true 
           return (
-            <Table.Cell {...cell.getCellProps()}>
-              {
-                !inEditState === false ? cell.render(() => {
+            <Table.Cell {...cell.getCellProps()} onClick={(e) => {                     
+              const idx = cell.row.index
+              const id = EDIT_MODE       
+              e.preventDefault()                              
+              if(!inEditState) {           
+                // console.log(`Going into edit mode..`)
+                updateRow(idx, 'editMode', true)                
+              }
+            }}>
+              {                
+                !inEditState ? cell.render(() => {
                   return <span>{cell.value}</span>
                 }) : cell.render('Cell')
               }
             </Table.Cell>
           )
-        } else {
-          //Handle edit action checkbox seperately
-          const inEditState = cell.value === true
-          const idx = cell.row.index
-          const id = cell.column.id
-          console.log(`checked ${cell.row.cells[2].value} .....  cell.Value ${cell.value} cell.Value === true ${cell.value === true}`)
-          return <Table.Cell {...cell.getCellProps()}>
-            {inEditState ?
-              cell.render(
-                () => {
-                  return <input type="checkbox" checked onChange={(e) => {
-                    e.preventDefault()
-                    updateRow(idx, id, false)
-                  }} />
-                }) : cell.render(
-                  () => {
-                    return <input type="checkbox" onChange={(e) => {
-                      e.preventDefault()
-                      updateRow(idx, id, true)
-                    }} />
-                  })
-            }
-          </Table.Cell>
-
-        }
       })}
     </Table.Row>
   }
@@ -122,9 +108,9 @@ const Grid = ({
   // Render the UI for your table
   return (
     <>
-      {/* <pre>
+      { <pre>
         <code>{JSON.stringify(initialState, null, 2)}</code>
-        </pre> */}
+        </pre> }
       <Table fixed celled selectable {...getTableProps()}>
         <Table.Header>
           {headerGroups.map(headerGroup => (
@@ -143,7 +129,16 @@ const Grid = ({
                     : !column.columns ? column.render('Header') : ''
                   }
                   {column.columns ?
-                    <div>
+                    <div>                                              
+                      <Button floated='left' className='ui primary button' onClick={() => {                                                                 
+                            addRow()                                                    
+                        }                      
+                      }> Add</Button>   
+                      <Button floated='left' className='ui primary button' onClick={() => {  
+                            setEditMode(-1, EDIT_MODE)                                                      
+                            rollbackChanges()                             
+                        }                      
+                      }> Rollback</Button>                                              
                       <Menu floated='right' pagination>
                         <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}>
                           <Icon name='chevron left' />
