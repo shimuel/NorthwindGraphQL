@@ -12,8 +12,8 @@ import 'semantic-ui-css/semantic.min.css';
 let authenticated = false;
 
 const loadApp = async () => {  
-  authenticated = await authenticate()  
-  if(authenticated){
+  //authenticated = await authenticate()  
+  //if(authenticated){
     const client = createClient()
       ReactDOM.render(
         <ApolloProvider client={client}>   
@@ -21,9 +21,9 @@ const loadApp = async () => {
         </ApolloProvider>,
         document.getElementById('root')
       )        
-  }else{
-    return <span>Authentication Failed</span>
-  }
+  //}else{
+  //  return <span>Authentication Failed</span>
+  //}
 }
 
 loadApp ()

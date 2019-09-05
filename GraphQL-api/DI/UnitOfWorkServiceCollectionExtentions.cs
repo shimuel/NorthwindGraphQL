@@ -22,49 +22,49 @@ namespace GraphQL_api.DI
             services.AddScoped<IUnitOfWork, UnitOfWork<TContext>>();
             services.AddScoped<IUnitOfWork<TContext>, UnitOfWork<TContext>>();
             
-            services.AddTransient<IDocumentExecuter, DocumentExecuter>();
+            //services.AddTransient<IDocumentExecuter, DocumentExecuter>();
            
-            services.AddSingleton<NorthwindQuery>();
-            services.AddSingleton<NorthwindMutation>();
+            // services.AddSingleton<NorthwindQuery>();
+            // services.AddSingleton<NorthwindMutation>();
             
-            services.AddSingleton<CategoryType>();
-            services.AddSingleton<CategoryTypeInputType>();
+            // services.AddSingleton<CategoryType>();
+            // services.AddSingleton<CategoryTypeInputType>();
 
-            services.AddSingleton<CustomerType>();
-            services.AddSingleton<CustomerInputType>();
+            // services.AddSingleton<CustomerType>();
+            // services.AddSingleton<CustomerInputType>();
             
-            services.AddSingleton<CustomerCustomerDemoType>();
-            services.AddSingleton<CustomerCustomerDemoTypeInputType>();
+            // services.AddSingleton<CustomerCustomerDemoType>();
+            // services.AddSingleton<CustomerCustomerDemoTypeInputType>();
 
-            services.AddSingleton<CustomerDemographicType>();
-            services.AddSingleton<CustomerDemographicTypeInputType>();
+            // services.AddSingleton<CustomerDemographicType>();
+            // services.AddSingleton<CustomerDemographicTypeInputType>();
 
-            services.AddSingleton<EmployeeType>();
-            services.AddSingleton<EmployeeTypeInputType>();
+            // services.AddSingleton<EmployeeType>();
+            // services.AddSingleton<EmployeeTypeInputType>();
 
-            services.AddSingleton<EmployeeTerritoryType>();
-            services.AddSingleton<EmployeeTerritoryTypeInputType>();
+            // services.AddSingleton<EmployeeTerritoryType>();
+            // services.AddSingleton<EmployeeTerritoryTypeInputType>();
 
-            services.AddSingleton<OrderType>();
-            services.AddSingleton<OrderTypeInputType>();
+            // services.AddSingleton<OrderType>();
+            // services.AddSingleton<OrderTypeInputType>();
 
-            services.AddSingleton<OrderDetailType>();
-            services.AddSingleton<OrderDetailTypeInputType>();
+            // services.AddSingleton<OrderDetailType>();
+            // services.AddSingleton<OrderDetailTypeInputType>();
 
-            services.AddSingleton<ProductType>();
-            services.AddSingleton<ProductTypeInputType>();
+            // services.AddSingleton<ProductType>();
+            // services.AddSingleton<ProductTypeInputType>();
 
-            services.AddSingleton<RegionType>();
-            services.AddSingleton<RegionTypeInputType>();
+            // services.AddSingleton<RegionType>();
+            // services.AddSingleton<RegionTypeInputType>();
 
-            services.AddSingleton<ShipperType>();
-            services.AddSingleton<ShipperTypeInputType>();
+            // services.AddSingleton<ShipperType>();
+            // services.AddSingleton<ShipperTypeInputType>();
 
-            services.AddSingleton<SupplierType>();
-            services.AddSingleton<SupplierTypeInputType>();
+            // services.AddSingleton<SupplierType>();
+            // services.AddSingleton<SupplierTypeInputType>();
 
-            services.AddSingleton<TerritoryType>();
-            services.AddSingleton<TerritoryTypeInputType>();
+            // services.AddSingleton<TerritoryType>();
+            // services.AddSingleton<TerritoryTypeInputType>();
 
             return services;
         }
