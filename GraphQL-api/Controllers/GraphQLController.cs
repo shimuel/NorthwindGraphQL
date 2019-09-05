@@ -21,7 +21,7 @@ namespace GraphQL_api.Controllers
         }
         
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Post([FromBody] GraphQL_api.Schema.GraphQLQuery query)
         {
             if (query == null) { throw new ArgumentNullException(nameof(query)); }

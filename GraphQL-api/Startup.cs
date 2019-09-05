@@ -80,7 +80,7 @@ namespace GraphQL_api
             // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-
+            /*
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -115,7 +115,7 @@ namespace GraphQL_api
                     ValidateAudience = false
                 };
             });
-
+            */
             // configure DI for application services
             services.AddScoped<IUserService, UserService>();
             //End of User
@@ -135,7 +135,7 @@ namespace GraphQL_api
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseAuthentication();
+            //app.UseAuthentication();
             app.UseCors("AllowSpecificOrigin");
             app.UseGraphiQl();
             app.UseMvc();

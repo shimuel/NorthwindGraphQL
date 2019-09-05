@@ -26,6 +26,16 @@ namespace DBLayer
             bool disableTracking = true,
             CancellationToken cancellationToken = default(CancellationToken));
 
+        
+        Task<DBLayer.Impl.PaginateGraphType<T>> GetListGraphTypeAsync(Expression<Func<T, bool>> predicate = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null,
+            int index = 0,
+            int size = 100,
+            bool disableTracking = true,
+            CancellationToken cancellationToken = default(CancellationToken));
+
+
         Task AddAsync(T entity, CancellationToken cancellationToken = default(CancellationToken));
 
         Task AddAsync(params T[] entities);

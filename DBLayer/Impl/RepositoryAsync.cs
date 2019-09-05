@@ -57,6 +57,25 @@ namespace DBLayer.Impl
             return query.ToPaginateAsync(index, size, 0, cancellationToken);
         }
 
+        public Task<PaginateGraphType<T>> GetListGraphTypeAsync(Expression<Func<T, bool>> predicate = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            Func<IQueryable<T>, IIncludableQueryable<T, object>> include = null,
+            int index = 0,
+            int size = 20,
+            bool disableTracking = true,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            IQueryable<T> query = _dbSet;
+            if (disableTracking) query = query.AsNoTracking();
+
+            if (include != null) query = include(query);
+
+            if (predicate != null) query = query.Where(predicate);
+
+            if (orderBy != null)
+                return orderBy(query).ToPaginateGraphTypeAsync(index, size, 0, cancellationToken);
+            return query.ToPaginateGraphTypeAsync(index, size, 0, cancellationToken);
+        }
         public Task AddAsync(T entity, CancellationToken cancellationToken = default(CancellationToken))
         {
             return _dbSet.AddAsync(entity, cancellationToken);
