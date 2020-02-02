@@ -46,6 +46,26 @@ namespace GraphQL_api.Schema
                 }
             );
 
+            Field<CustmersPageInfoType>(
+                "CustomersPage",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "index", Description = "page of the list" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "size", Description = "size of the list returned" },
+                    new QueryArgument<StringGraphType> { Name = "searchByFirstName", Description = "filter by name" },
+                    new QueryArgument<StringGraphType> { Name = "searchByLastName", Description = "filter by name" }
+                ),
+                resolve: context => {
+                    var index = context.GetArgument<int>("index"); 
+                    var size = context.GetArgument<int>("size"); 
+                    var tmp = uow.GetRepositoryAsync<Customer>().GetListAsync(
+                            index : index, 
+                            size:size <= 0 ? 3 : size,
+                            include: q => q.Include(j => j.CustomerCustomerDemo)
+                        );                     
+                    return new PageInfo<Customer>(tmp.Result.Items, index, tmp.Result.Count, size);
+                }
+            );
+
             Field<ListGraphType<CustomerType>>(
                 "customers",
                 resolve: context => {
@@ -152,7 +172,7 @@ namespace GraphQL_api.Schema
                     return tmp;
             });
 
-            Field<PageInfoType>(
+            Field<OrdersPageInfoType>(
                 "OrdersPage",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "index", Description = "page of the list" },

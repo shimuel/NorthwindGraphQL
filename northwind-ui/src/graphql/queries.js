@@ -85,6 +85,27 @@ const GET_ORDERS_PAGE = gql`
     }
 `;
 
+const GET_CUSTOMERS_PAGE = gql`    
+    query($index:Int!,$size:Int!) {
+        customersPage(index:$index, size:$size)
+        {
+            pageCount
+            size
+            totalCount
+            items{
+            customerId
+            companyName
+            contactName
+            customerCustomerDemo{
+                customerType {
+                customerDesc
+                }
+            }
+            }
+        }
+    }
+`;
+
 const AUTH_USER = gql`
   mutation authenticate($input: newUser!) {
     authenticate(input: $newUser)
@@ -96,4 +117,4 @@ const AUTH_USER = gql`
   }
 `;
 
-export { GET_ORDERS, GET_ORDERS_PAGE, GET_ORDERS_COUNT }
+export { GET_ORDERS, GET_ORDERS_PAGE, GET_ORDERS_COUNT, GET_CUSTOMERS_PAGE }

@@ -32,6 +32,7 @@ namespace GraphQL_api.DI
             services.AddSingleton<CategoryTypeInputType>();
 
             services.AddSingleton<CustomerType>();
+            services.AddSingleton<CustmersPageInfoType>();
             services.AddSingleton<CustomerInputType>();
             
             services.AddSingleton<CustomerCustomerDemoType>();
@@ -47,7 +48,7 @@ namespace GraphQL_api.DI
             services.AddSingleton<EmployeeTerritoryTypeInputType>();
 
             services.AddSingleton<OrderType>();
-            services.AddSingleton<PageInfoType>();
+            services.AddSingleton<OrdersPageInfoType>();
             services.AddSingleton<OrderTypeInputType>();
 
             services.AddSingleton<OrderDetailType>();

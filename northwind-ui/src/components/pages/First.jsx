@@ -1,7 +1,11 @@
-import React from "react";
+
 import styled from "styled-components";
-import {FirstView} from '../views/RenderFirst'
+import React, { useState } from "react";
+import "../../App.css";
+
 import { Container } from 'react-bootstrap';
+import { FirstView } from '../views/RenderFirst';
+
 function First() {
   return (
     <Container>
@@ -21,3 +25,5 @@ const Wrapper = styled.div`
 `;
 
 export default First;
+
+

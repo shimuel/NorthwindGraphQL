@@ -37,11 +37,28 @@ namespace GraphQL_api.Schema.Model
         }
     }
 
-    public class PageInfoType : ObjectGraphType<PageInfo<Order>>  //where T : GraphType
+    public class OrdersPageInfoType : ObjectGraphType<PageInfo<Order>>  //where T : GraphType
     {
-        public PageInfoType()
+        public OrdersPageInfoType()
         {
             Field<ListGraphType<OrderType>>(
+                "Items",
+                resolve: context => {
+                    return context.Source.List;
+                }
+            );
+            //Field(xx => xx.Chars);
+            Field(xx => xx.PageCount);
+            Field(xx => xx.Size);
+            Field(xx => xx.TotalCount);
+        }
+    }
+
+    public class CustmersPageInfoType : ObjectGraphType<PageInfo<Customer>>  //where T : GraphType
+    {
+        public CustmersPageInfoType()
+        {
+            Field<ListGraphType<CustomerType>>(
                 "Items",
                 resolve: context => {
                     return context.Source.List;
