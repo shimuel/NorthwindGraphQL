@@ -31,7 +31,7 @@ const OrdersView = () => {
               type:"string"
             })
     columns.set("companyName", {
-              header: 'First Name',
+              header: 'Company Name',
               accessor: 'companyName',
               minWidth: 150,
               isFilter:true,
@@ -42,7 +42,7 @@ const OrdersView = () => {
               type:"string"
             })
     columns.set("shipVia", {
-              header: 'Last Name',
+              header: 'Shipped by',
               accessor: 'shipVia',
               minWidth: 150,
               isFilter:false,
