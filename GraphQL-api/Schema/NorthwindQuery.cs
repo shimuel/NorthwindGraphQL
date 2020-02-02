@@ -3,6 +3,7 @@ using GraphQL.Types;
 using DBLayer;
 using DBLayer.Entities;
 using GraphQL_api.Schema.Model;
+using System.Linq;
 
 namespace GraphQL_api.Schema
 {
@@ -151,6 +152,28 @@ namespace GraphQL_api.Schema
                     return tmp;
             });
 
+            Field<PageInfoType>(
+                "OrdersPage",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "index", Description = "page of the list" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "size", Description = "size of the list returned" },
+                    new QueryArgument<StringGraphType> { Name = "searchByFirstName", Description = "filter by name" },
+                    new QueryArgument<StringGraphType> { Name = "searchByLastName", Description = "filter by name" }
+                ),
+                resolve: context => {
+                    var index = context.GetArgument<int>("index"); 
+                    var size = context.GetArgument<int>("size"); 
+                    var tmp = uow.GetRepositoryAsync<Order>().GetListAsync(
+                            index : index, 
+                            size:size <= 0 ? 3 : size,
+                            include: q => q.Include(j => j.Employee)
+                            .Include(k=>k.OrderDetails).ThenInclude(p=>p.Product).ThenInclude(p=>p.Category)                         
+                            .Include(k=>k.Customer).Include(k=>k.ShipViaNavigation)
+                        );                     
+                    return new PageInfo<Order>(tmp.Result.Items, index, tmp.Result.Count, size);
+                }
+            );
+
             Field<ListGraphType<OrderType>>(
                 "Orders",
                 arguments:  new QueryArguments(
@@ -177,7 +200,7 @@ namespace GraphQL_api.Schema
                         );                     
                      }
                     return tmp.Result.Items;
-            }); 
+            });
 
             //OrderDetails
             Field<OrderType>(

@@ -17,8 +17,8 @@ import {
 
 const GridWrapper = (props) => {
 
-  const { gridCols, onDataRecieved, initState, fetchMore, queryParams, rowCount, newItemCallback } = props
-  const state = initState//{ pageSize: 3,pageIndex:0, sortBy: [{ id: 'companyName', asc: true }] }
+  const { gridCols, onDataRecieved, initState, fetchMore, fetchPageCount, queryParams, newItemCallback } = props
+  const state = initState//{ pageSize: 3,pageIndex:0, sortBgridPageSettings.rowCount={data.ordersPage.totalLength}y: [{ id: 'companyName', asc: true }] }
 
   //Setup State
   const tableState = useTableState(state)
@@ -153,30 +153,33 @@ const GridWrapper = (props) => {
     // This will get called when the table needs new data
     // You could fetch your data from literally anywhere,
     // even a server. But for this example, we'll just fake it.
-
     // Set the loading state
     setLoading(true)
 
     // We'll even set a delay to simulate a server here
-    const startRow = pageSize * pageIndex
-    const endRow = startRow + pageSize
+    // const startRow = pageSize * pageIndex
+    // const endRow = startRow + pageSize
     const pa = { ...queryParams, pageIndex, pageSize }
-    fetchMore(pa).then((nextData) => {      
+
+    fetchMore(pa).then((nextData) => {   
+      
+      setPageCount(fetchPageCount(nextData.data))
       let d = onDataRecieved(nextData)
-      // d = d.slice(startRow, endRow)      
-      d = d.slice(0, 3)
+      d = d.slice(0, pageSize)
       d =  d.map(i => {        
         return {...i, [EDIT_MODE]: false}
       })
       setData(d)
       setMasterData(d)
+
+      console.log(`pageCount ${pageCount}`)
     });
 
 
     // Your server could send back total page count.
     // For now we'll just fake it, too
-    setPageCount(Math.ceil(rowCount / pageSize))
-    console.log(`pageCount ${pageCount}`)
+    //setPageCount(Math.ceil(rowCount / pageSize))
+
     setLoading(false)
   }, [])
 
@@ -260,6 +263,7 @@ const GridWrapper = (props) => {
     border: 1px red solid;
     height:30px;
   `
+  
   return (
     <Grid columns={gridColumns}
       gridColsMetaData={gridCols}
@@ -268,7 +272,7 @@ const GridWrapper = (props) => {
       initialState={tableState}
       fetchData={fetchData}
       loading={loading}
-      pageCount={rowCount}
+      pageCount={pageCount}
       filterTypes={filterTypes}
       updateRow={updateRow}
       addRow={addRow}

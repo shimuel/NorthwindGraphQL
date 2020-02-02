@@ -52,6 +52,39 @@ const GET_ORDERS = gql`
     }
 `;
 
+const GET_ORDERS_PAGE = gql`    
+    query($index:Int!,$size:Int!) {
+        ordersPage(index:$index, size:$size)
+        {
+            pageCount
+            size
+            totalCount
+            items{
+            orderId
+            orderDate
+            customer{
+                companyName
+            }
+            orderDetails{
+            product{
+                productName
+                category{
+                    categoryName
+                }
+            }
+                quantity
+            }
+            employee{
+                firstName
+            }
+            shipViaNavigation{
+                companyName
+            }
+            }
+        }
+    }
+`;
+
 const AUTH_USER = gql`
   mutation authenticate($input: newUser!) {
     authenticate(input: $newUser)
@@ -63,4 +96,4 @@ const AUTH_USER = gql`
   }
 `;
 
-export { GET_ORDERS }
+export { GET_ORDERS, GET_ORDERS_PAGE, GET_ORDERS_COUNT }

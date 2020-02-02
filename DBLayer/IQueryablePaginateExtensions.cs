@@ -17,7 +17,8 @@ namespace DBLayer
             if (from > index) throw new ArgumentException($"From: {from} > Index: {index}, must From <= Index");
 
             var count = await source.CountAsync(cancellationToken).ConfigureAwait(false);
-            var items = await source.Skip((index - from) * size)
+            var skip = (index - from) * size;
+            var items = await source.Skip(skip)
                 .Take(size).ToListAsync(cancellationToken).ConfigureAwait(false);
 
             var list = new Paginate<T>

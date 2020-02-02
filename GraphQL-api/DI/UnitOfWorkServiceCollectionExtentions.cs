@@ -26,7 +26,8 @@ namespace GraphQL_api.DI
            
             services.AddSingleton<NorthwindQuery>();
             services.AddSingleton<NorthwindMutation>();
-            
+            //typeof(IThing<>), typeof(GenericThing<>)
+
             services.AddSingleton<CategoryType>();
             services.AddSingleton<CategoryTypeInputType>();
 
@@ -46,6 +47,7 @@ namespace GraphQL_api.DI
             services.AddSingleton<EmployeeTerritoryTypeInputType>();
 
             services.AddSingleton<OrderType>();
+            services.AddSingleton<PageInfoType>();
             services.AddSingleton<OrderTypeInputType>();
 
             services.AddSingleton<OrderDetailType>();
