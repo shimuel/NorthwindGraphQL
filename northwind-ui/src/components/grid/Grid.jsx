@@ -5,7 +5,7 @@ import { Table, Icon, Label, Menu, Dropdown, Button } from 'semantic-ui-react'
 import  { EDIT_MODE } from './GridExtn'
 import {
   useTable,
-  useGroupBy,
+  //useGroupBy,
   useFilters,
   useSortBy,
   useExpanded,
@@ -19,6 +19,7 @@ import matchSorter from 'match-sorter'
 import { useQuery } from "@apollo/react-hooks";
 
 const Grid = ({
+  isGridEditabe,
   columns,
   gridColsMetaData,
   data,
@@ -78,7 +79,7 @@ const Grid = ({
     useRowSelect
   )
 
-  const myRowFunc = (row) => {
+  const setUpRow = (row) => {
     return <Table.Row {...row.getRowProps()}>
       {row.cells.map((cell) => {        
         //console.log(`EDIT_MODE ${EDIT_MODE} ${cell.row.original.editMode} ${cell.value}`)
@@ -105,62 +106,89 @@ const Grid = ({
     </Table.Row>
   }
 
+  const renderHeaderFilters = (column) => {
+    if(gridColsMetaData.get(column.id) && gridColsMetaData.get(column.id).isFilter )
+      return column.render('Filter')
+    else
+      return null
+  }
+  const renderHeaderSortIndicators = (column) => {
+      
+    if(!column.columns /*! the Group Header Column*/ ) {
+      if(gridColsMetaData.get(column.id).isSortable === true ) {
+        return <div {...column.getSortByToggleProps()}>
+          <span>
+            {column.isSortedDesc
+              ? ' 🔽'
+              : ' 🔼'
+            }
+          </span>
+          {column.render('Header')}
+        </div>
+      } else 
+          return column.render('Header')
+    }
+    return null
+  }
+
+  const renderHeaderAddRollbackButtons = (column, isGridEitable) => {
+    /*the Group Header Column*/ 
+    if(column.columns ) {
+        if(isGridEitable) {
+            return <div>                                        
+                    <Button floated='left' className='ui primary button' onClick={() => {                                                                 
+                          addRow()                                                    
+                      }                      
+                    }> Add</Button>   
+                    <Button floated='left' className='ui primary button' onClick={() => {  
+                          setEditMode(-1, EDIT_MODE)                                                      
+                          rollbackChanges()                             
+                      }                      
+                    }> Rollback</Button>     
+                    {column.render('Header') }                                         
+                  </div>
+        }
+        else
+        return column.render('Header')      
+    } else return null
+  }
+
+  const renderScrollingButtons = () => {
+      return <Menu floated='right' pagination>
+              <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}>
+                <Icon name='chevron left' />
+              </Menu.Item>
+              <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
+                <Icon name='chevron right' />
+              </Menu.Item>
+            </Menu>
+  }
   // Render the UI for your table
   return (
     <>
-      { <pre>
+      { /*<pre>
         <code>{JSON.stringify(initialState, null, 2)}</code>
-        </pre> }
+      </pre> */}
       <Table fixed celled selectable {...getTableProps()}>
         <Table.Header>
           {headerGroups.map(headerGroup => (
             <Table.Row {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map(column => {                
                 return <Table.HeaderCell {...column.getHeaderProps()} >
-                  {!column.columns && gridColsMetaData.get(column.id).isSortable === true ?
-                    <div {...column.getSortByToggleProps()}>
-                      <span>
-                        {column.isSortedDesc
-                          ? ' 🔽'
-                          : ' 🔼'}
-                      </span>
-                      {!column.columns ? column.render('Header') : ''}
-                    </div>
-                    : !column.columns ? column.render('Header') : ''
-                  }
-                  {column.columns ?
-                    <div>                                              
-                      <Button floated='left' className='ui primary button' onClick={() => {                                                                 
-                            addRow()                                                    
-                        }                      
-                      }> Add</Button>   
-                      <Button floated='left' className='ui primary button' onClick={() => {  
-                            setEditMode(-1, EDIT_MODE)                                                      
-                            rollbackChanges()                             
-                        }                      
-                      }> Rollback</Button>                                              
-                      <Menu floated='right' pagination>
-                        <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}>
-                          <Icon name='chevron left' />
-                        </Menu.Item>
-                        <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
-                          <Icon name='chevron right' />
-                        </Menu.Item>
-                      </Menu>
-                    </div>
-                    : ''}
-                  {<div>{gridColsMetaData.get(column.id) && gridColsMetaData.get(column.id).isFilter ? column.render('Filter') : null}</div>}
+                  {renderHeaderSortIndicators(column)}
+                  {renderHeaderAddRollbackButtons(column, isGridEditabe) }
+                  {column.columns ? renderScrollingButtons() : ''}
+                  <div>{renderHeaderFilters(column)}</div>
                 </Table.HeaderCell>
               })}
             </Table.Row>
           ))}
         </Table.Header>
         <Table.Body>
-          {page.map(
-            (row, i) =>
-              prepareRow(row) || (
-                myRowFunc(row)
-              )
+          {page.map((row, i) => {
+             prepareRow(row)
+              return  setUpRow(row)
+            }
           )}
           {loading ? (
             // Use our custom loading state to show a loading indicator
@@ -172,14 +200,7 @@ const Grid = ({
         <Table.Footer>
           <Table.Row>
             <Table.HeaderCell colSpan={gridColsMetaData.size}>
-              <Menu floated='right' pagination>
-                <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}>
-                  <Icon name='chevron left' />
-                </Menu.Item>
-                <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
-                  <Icon name='chevron right' />
-                </Menu.Item>
-              </Menu>
+              {renderScrollingButtons()}
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>

@@ -17,7 +17,7 @@ import {
 
 const GridWrapper = (props) => {
 
-  const { gridCols, onDataRecieved, initState, fetchMore, fetchPageCount, queryParams, newItemCallback } = props
+  const { gridHeader, gridCols, onDataRecieved, initState, fetchMore, fetchPageCount, queryParams, newItemCallback } = props
   const state = initState//{ pageSize: 3,pageIndex:0, sortBgridPageSettings.rowCount={data.ordersPage.totalLength}y: [{ id: 'companyName', asc: true }] }
 
   //Setup State
@@ -31,6 +31,8 @@ const GridWrapper = (props) => {
     },
     [pageIndex, pageSize]
   )
+
+  let isGridEditabe = false
 
   //Setup Grid Column metadata
   let cols = []
@@ -54,12 +56,18 @@ const GridWrapper = (props) => {
 
       case "EditableListCell":
         c.Cell = EditableListCell
+        if(!isGridEditabe)
+        isGridEditabe = true
         break;
       case "EditableTextCell":
         c.Cell = EditableTextCell
+        if(!isGridEditabe)
+        isGridEditabe = true
         break;
       case "EditableSelectionCell":
         c.Cell = EditableCheckboxCell
+        if(!isGridEditabe)
+        isGridEditabe = true
         break;
       case "HiddenCell":
         c.Cell = HiddenCell
@@ -96,7 +104,7 @@ const GridWrapper = (props) => {
   const gridColumns = React.useMemo(
     () => [
       {
-        Header: ' ORDER ',
+        Header: gridHeader,
         columns: cols,
       }
     ],
@@ -194,6 +202,7 @@ const GridWrapper = (props) => {
     setData(masterData)
   }
 
+  //Turn on edit mode for all cells in the row to be edited and turn off edit in other rows
   const setEditMode = (rowIndex, columnID) => {
 
     setData(old =>
@@ -221,9 +230,14 @@ const GridWrapper = (props) => {
 
   }
 
+  // This method is called 
+  //1. to turnOn the edit state
+  //2. focus shifts from 1 cell to another cell in the editig row
+  //3. when focus shifts out of the editing row to another row
+  // turns on Edit mode and ALSO to update any changes done 
   // When our cell renderer calls updateRow, we'll use
   // the rowIndex, columnID and new value to update the
-  // original data
+  // original data with the new value
   const updateRow = (rowIndex, columnID, value) => {
     // We also turn on the flag to not reset the page
     //console.log(`${rowIndex} ${columnID} ${value}`)
@@ -265,7 +279,9 @@ const GridWrapper = (props) => {
   `
   
   return (
-    <Grid columns={gridColumns}
+    <Grid 
+      isGridEditabe={isGridEditabe}
+      columns={gridColumns}
       gridColsMetaData={gridCols}
       defaultColumn={defaultReadOnlyColumn}
       data={data}

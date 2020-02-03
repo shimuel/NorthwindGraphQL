@@ -7,7 +7,8 @@ import  {GridWrapper} from '../grid/GridWrapper'
 
 const OrdersView = () => {
 
-    let columns = new Map();
+let columns = new Map();
+
     columns.set("orderDate", {
       header: 'Order Date',
       accessor: 'orderDate',
@@ -20,38 +21,39 @@ const OrdersView = () => {
       type:"date"
     })
     columns.set("orderId", {
-              header: 'Order Id',
-              accessor: 'orderId',
-              minWidth: 150,
-              isFilter:false,
-              filterType:"",
-              //editor:'EditableTextCell',
-              isSortable:false,              
-              show:true,
-              type:"string"
-            })
-    columns.set("companyName", {
-              header: 'Company Name',
-              accessor: 'companyName',
-              minWidth: 150,
-              isFilter:true,
-              filterType:"containsFilter",
-              editor:'EditableTextCell',
-              isSortable:false,              
-              show:true,
-              type:"string"
-            })
-    columns.set("shipVia", {
-              header: 'Shipped by',
-              accessor: 'shipVia',
-              minWidth: 150,
-              isFilter:false,
-              filterType:"SelectColumnFilter",
-              editor:'EditableListCell',
-              isSortable:true,
-              show:true,
-              type:"string"
+      header: 'Order Id',
+      accessor: 'orderId',
+      minWidth: 150,
+      isFilter:false,
+      filterType:"",
+      //editor:'EditableTextCell',
+      isSortable:false,              
+      show:true,
+      type:"string"
     })
+    columns.set("companyName", {
+      header: 'Company Name',
+      accessor: 'companyName',
+      minWidth: 150,
+      isFilter:true,
+      filterType:"containsFilter",
+      editor:'EditableTextCell',
+      isSortable:false,              
+      show:true,
+      type:"string"
+    })
+    columns.set("shipVia", {
+      header: 'Shipped by',
+      accessor: 'shipVia',
+      minWidth: 150,
+      isFilter:false,
+      filterType:"SelectColumnFilter",
+      editor:'EditableListCell',
+      isSortable:true,
+      show:true,
+      type:"string"
+    })
+
     columns.set(EDIT_MODE,EDITMODE_METADATA())//To track a cols edit state// A checkbox for activating a edit    
 
     const extractData = (previousData, nextData ) => {
@@ -120,7 +122,8 @@ const OrdersView = () => {
     return (
         <div className="Home">    
             <span>Test</span>       
-            <GridWrapper                    
+            <GridWrapper        
+                    gridHeader='Orders'              
                     gridCols={columns}
                     initialSortColumn='companyName' 
                     fetchMore={fetchData}
