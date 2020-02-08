@@ -1,31 +1,5 @@
 import { gql } from "apollo-boost";
 
-const GET_ORDERS_COUNT = gql`    
-    query {
-        orders {
-            customer{
-                companyName
-            }
-            orderDetails{
-            product{
-                productName
-                category{
-                    categoryName
-                }
-            }
-                quantity
-            }
-            employee{
-                firstName
-            }
-            shipViaNavigation{
-                companyName
-            }
-            orderDate
-        }
-    }
-`;
-
 const GET_ORDERS = gql`    
     query($index:Int, $size:Int) {
         orders(index:$index, size:$size){
@@ -106,6 +80,27 @@ const GET_CUSTOMERS_PAGE = gql`
     }
 `;
 
+const GET_PRODUCT_LIST = gql`    
+    query {
+    products{
+      productId
+      productName
+    }
+  }
+`;
+
+const GET_REGION_LIST = gql`    
+    query {
+    regions{
+      regionId
+      regionDescription
+      territories{
+        territoryDescription
+      }
+    }
+  }
+`;
+
 const AUTH_USER = gql`
   mutation authenticate($input: newUser!) {
     authenticate(input: $newUser)
@@ -117,4 +112,10 @@ const AUTH_USER = gql`
   }
 `;
 
-export { GET_ORDERS, GET_ORDERS_PAGE, GET_ORDERS_COUNT, GET_CUSTOMERS_PAGE }
+export { 
+    GET_ORDERS, 
+    GET_ORDERS_PAGE, 
+    GET_CUSTOMERS_PAGE,
+    GET_PRODUCT_LIST,
+    GET_REGION_LIST
+}

@@ -13,11 +13,14 @@ import {
   EditableTextCell,
   EditableListCell,
   EditableCheckboxCell,
-  EDIT_MODE} from './GridExtn'
+  EDIT_MODE,
+  EDITMODE_METADATA} from './GridExtn'
+  
 
 const GridWrapper = (props) => {
 
-  const { gridHeader, gridCols, onDataRecieved, initState, fetchMore, fetchPageCount, queryParams, newItemCallback } = props
+  const { gridHeader, gridCols, onDataRecieved, initState, fetchMore, fetchPageCount, queryParams, newItemCallback, onRowSelect } = props
+  let { isGridEditabe } = props
   const state = initState//{ pageSize: 3,pageIndex:0, sortBgridPageSettings.rowCount={data.ordersPage.totalLength}y: [{ id: 'companyName', asc: true }] }
 
   //Setup State
@@ -32,12 +35,11 @@ const GridWrapper = (props) => {
     [pageIndex, pageSize]
   )
 
-  let isGridEditabe = false
-
+   isGridEditabe = isGridEditabe  || false
   //Setup Grid Column metadata
   let cols = []
-  gridCols.forEach((v) => {
-    const { isFilter, filterType, isSortable, type, header, accessor, editor, show } = v
+  gridCols.forEach((cObj) => {
+    const { isFilter, filterType, isSortable, header, accessor, editor, show } = cObj
     let c = {
       Header: header,
       accessor
@@ -52,30 +54,27 @@ const GridWrapper = (props) => {
       c.isSorted = false
       c.isSortedDesc = false
     }
-    switch (editor) {
 
-      case "EditableListCell":
-        c.Cell = EditableListCell
-        if(!isGridEditabe)
-        isGridEditabe = true
-        break;
-      case "EditableTextCell":
-        c.Cell = EditableTextCell
-        if(!isGridEditabe)
-        isGridEditabe = true
-        break;
-      case "EditableSelectionCell":
-        c.Cell = EditableCheckboxCell
-        if(!isGridEditabe)
-        isGridEditabe = true
-        break;
-      case "HiddenCell":
-        c.Cell = HiddenCell
-        break;
-      default:
-        break;
+    if(isGridEditabe) {
+      switch (editor) {
+
+        case "EditableListCell":
+          c.Cell = EditableListCell
+          break;
+        case "EditableTextCell":
+          c.Cell = EditableTextCell
+          break;
+        case "EditableSelectionCell":
+          c.Cell = EditableCheckboxCell
+          break;
+        case "HiddenCell":
+          c.Cell = HiddenCell
+          break;
+        default:
+          break;
+      }
     }
-
+    
     if (isFilter) {
 
       switch (filterType) {
@@ -99,6 +98,9 @@ const GridWrapper = (props) => {
     }
     cols.push(c)
   })
+
+  if(isGridEditabe)
+    gridCols.set(EDIT_MODE,EDITMODE_METADATA())
 
   //Now setup the Columns
   const gridColumns = React.useMemo(
@@ -292,6 +294,7 @@ const GridWrapper = (props) => {
       filterTypes={filterTypes}
       updateRow={updateRow}
       addRow={addRow}
+      onRowSelect={onRowSelect}
       newGridIdItem={newItemCallback}
       setEditMode={setEditMode}
       deleteRow={deleteRow}

@@ -56,32 +56,32 @@ let columns = new Map();
 
     columns.set(EDIT_MODE,EDITMODE_METADATA())//To track a cols edit state// A checkbox for activating a edit    
 
-    const extractData = (previousData, nextData ) => {
-      
-      if(nextData){
-          return nextData.ordersPage.items.map(order => {
+  const extractData = (previousData, nextData ) => {
+    
+    if(nextData){
+        return nextData.ordersPage.items.map(order => {
+          const {customer:customer, orderDate:orderDate, orderId:orderId, shipViaNavigation:shipViaNavigation} = order
+          const orderInfo = {companyName:customer.companyName, orderDate:orderDate, orderId:orderId, shipVia:shipViaNavigation.companyName}
+          return orderInfo
+      })
+    }else{
+      //paging mode
+      if(previousData &&  previousData.data.ordersPage && previousData.data.ordersPage.items){
+        return previousData.data.ordersPage.items.map(order => {
             const {customer:customer, orderDate:orderDate, orderId:orderId, shipViaNavigation:shipViaNavigation} = order
             const orderInfo = {companyName:customer.companyName, orderDate:orderDate, orderId:orderId, shipVia:shipViaNavigation.companyName}
             return orderInfo
         })
-      }else{
-        //paging mode
-        if(previousData &&  previousData.data.ordersPage && previousData.data.ordersPage.items){
-          return previousData.data.ordersPage.items.map(order => {
-              const {customer:customer, orderDate:orderDate, orderId:orderId, shipViaNavigation:shipViaNavigation} = order
-              const orderInfo = {companyName:customer.companyName, orderDate:orderDate, orderId:orderId, shipVia:shipViaNavigation.companyName}
-              return orderInfo
-          })
-        }else if(previousData && previousData.data &&  previousData.data.ordersPage &&  previousData.data.ordersPage.items){
+      }else if(previousData && previousData.data &&  previousData.data.ordersPage &&  previousData.data.ordersPage.items){
 
-          return previousData.data.ordersPage.items.map(order => {
-              const {customer:customer, orderDate:orderDate, orderId:orderId, shipViaNavigation:shipViaNavigation} = order
-              const orderInfo =  {companyName:customer.companyName, orderDate:orderDate, orderId:orderId, shipVia:shipViaNavigation.companyName}
-              return orderInfo
-          })
-        }
+        return previousData.data.ordersPage.items.map(order => {
+            const {customer:customer, orderDate:orderDate, orderId:orderId, shipViaNavigation:shipViaNavigation} = order
+            const orderInfo =  {companyName:customer.companyName, orderDate:orderDate, orderId:orderId, shipVia:shipViaNavigation.companyName}
+            return orderInfo
+        })
       }
     }
+  }
 
   const fetchPageCount = (data) => {
     return data.ordersPage.pageCount; 
@@ -130,7 +130,8 @@ let columns = new Map();
                     fetchPageCount = {fetchPageCount}
                     onDataRecieved={extractData} 
                     initState ={gridPageSettings}
-                    newItemCallback={addData}/>            
+                    newItemCallback={addData}
+                    isGridEditabe={true}/>            
         </div>
     )
 }

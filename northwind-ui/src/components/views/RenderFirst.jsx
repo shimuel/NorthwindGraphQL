@@ -1,8 +1,7 @@
 import React from "react";
 import "../../App.css";
-import { useQuery } from "@apollo/react-hooks";
-import  { GET_CUSTOMERS_PAGE } from '../../graphql/queries'
-import  { EDIT_MODE, EDITMODE_METADATA } from '../grid/GridExtn'
+import { useQuery, useLazyQuery } from "@apollo/react-hooks";
+import  { GET_CUSTOMERS_PAGE, GET_PRODUCT_LIST, GET_REGION_LIST } from '../../graphql/queries'
 import  {GridWrapper} from '../grid/GridWrapper'
 
 const FirstView = () => {
@@ -46,7 +45,7 @@ const FirstView = () => {
     })
     // companyName
     //   contactName
-    columns.set(EDIT_MODE,EDITMODE_METADATA())
+    // columns.set(EDIT_MODE,EDITMODE_METADATA())
 
     const extractData = (previousData, nextData ) => {
       
@@ -79,9 +78,33 @@ const FirstView = () => {
       
     const gridPageSettings = {pageSize: 3,pageIndex:1}
 
-    const { data, loading, error, fetchMore } = useQuery(GET_CUSTOMERS_PAGE, {
+    const ORDERS/*{ data, loading, error, fetchMore }*/ = useQuery(GET_CUSTOMERS_PAGE, {
         variables: {size: gridPageSettings.pageSize,index:gridPageSettings.pageSize}
     });
+
+    const [fetchQuery1, { loading1, data1 }] = useLazyQuery(GET_PRODUCT_LIST);
+    // const [fetchQuery2, { loading2, data2 }] = useLazyQuery(GET_REGION_LIST);
+
+    // useEffect(() => {
+    //   if (!GetStage.loading && GetStage.data.getGame.stage === "Created") {
+    //     fetchQuery1({variables: {
+    //      input: {
+    //         id: getId.id
+    //       }
+    //     }})
+    //   } else if (!GetStage.loading && GetStage.data.getGame.stage === "Confirmed") {
+    //     fetchQuery2({variables: {
+    //      input: {
+    //         id: getId.id
+    //       }
+    //     }})
+    //   } 
+    // }, [GetState.data, GetStage.loading])
+
+    const onRowSelect = (rowId, colId, data) => {
+      debugger
+      console.log('ssss');
+    }
 
     const fetchPageCount = (data) => {
         return data.customersPage.pageCount; 
@@ -93,7 +116,7 @@ const FirstView = () => {
 
     const fetchData = async  (p) =>{
 
-        return fetchMore({
+        return ORDERS.fetchMore({
             variables: {index:p.pageIndex, size:p.pageSize},
             updateQuery: (previous, { fetchMoreResult }) => {                                    
             console.log(`Calling updateQuery `)        
@@ -101,15 +124,15 @@ const FirstView = () => {
             }      
         })
     }
-
-    if (loading) {
+    
+    if (ORDERS.loading) {
       console.log('loading..')
       return <div>Loading...</div>;
     }
 
-    if (error) {
+    if (ORDERS.error) {
       console.log('error..')
-      return <div>Error! {error.message}</div>;
+      return <div>Error! {ORDERS.error.message}</div>;
     }
 
     return (
@@ -123,7 +146,7 @@ const FirstView = () => {
                 fetchPageCount = {fetchPageCount}
                 onDataRecieved={extractData} 
                 initState ={gridPageSettings}
-                newItemCallback={addData}/>            
+                onRowSelect={onRowSelect}/>            
         </div>
     )
 

@@ -79,7 +79,7 @@ const Grid = ({
     useRowSelect
   )
 
-  const setUpRow = (row) => {
+  const onSelectRow = (row) => {
     return <Table.Row {...row.getRowProps()}>
       {row.cells.map((cell) => {        
         //console.log(`EDIT_MODE ${EDIT_MODE} ${cell.row.original.editMode} ${cell.value}`)
@@ -97,6 +97,7 @@ const Grid = ({
             }}>
               {                
                 !inEditState ? cell.render(() => {
+
                   return <span>{cell.value}</span>
                 }) : cell.render('Cell')
               }
@@ -187,7 +188,7 @@ const Grid = ({
         <Table.Body>
           {page.map((row, i) => {
              prepareRow(row)
-              return  setUpRow(row)
+              return  onSelectRow(row)
             }
           )}
           {loading ? (
