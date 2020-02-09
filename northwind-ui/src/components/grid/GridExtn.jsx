@@ -7,6 +7,8 @@ import matchSorter from 'match-sorter'
 
 /* ALL BELOW Functions OUTSIDE GRIDWRAPPER & GRID */
 const EDIT_MODE = "editMode"
+const ACTION_SAVED = "saved"
+const ACTION_CANCELLED = "cancelled"
 
 const EDITMODE_METADATA = () => {
   return {
@@ -101,12 +103,14 @@ const DefaultColumnFilter = ({
   
     const onSave = e => {
       console.log('Saving...')
-      updateRow(index, EDIT_MODE, false)
+      console.log(`From HiddenCell...${index}, ${id}, ${value}`)
+      updateRow(index, EDIT_MODE, ACTION_SAVED)
     }
     
     const onCancel = e => {      
       console.log('Cancelled...')
-      setEditMode(-1, EDIT_MODE, false)
+      console.log(`From HiddenCell...${index}, ${id}, ${value}`)
+      updateRow(index, EDIT_MODE, ACTION_CANCELLED)
     }
 
     // If the initialValue is changed externall, sync it up with our state
@@ -242,6 +246,8 @@ const DefaultColumnFilter = ({
     EditableListCell,
     EditableCheckboxCell,
     EDIT_MODE,
+    ACTION_SAVED,
+    ACTION_CANCELLED,
     EDITMODE_METADATA
   }
 

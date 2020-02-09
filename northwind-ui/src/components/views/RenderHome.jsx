@@ -56,7 +56,7 @@ let columns = new Map();
 
     columns.set(EDIT_MODE,EDITMODE_METADATA())//To track a cols edit state// A checkbox for activating a edit    
 
-  const extractData = (previousData, nextData ) => {
+  const onDataRecieved = (previousData, nextData ) => {
     
     if(nextData){
         return nextData.ordersPage.items.map(order => {
@@ -102,7 +102,7 @@ let columns = new Map();
       })
   }
 
-  const gridPageSettings = {pageSize: 3,pageIndex:1}
+  const gridPageSettings = {pageSize: 3,pageIndex:0}
 
   const { data, loading, error, fetchMore } = useQuery(/*GET_ORDERS*/GET_ORDERS_PAGE, {
     variables: {size: gridPageSettings.pageSize,index:gridPageSettings.pageSize}
@@ -128,9 +128,9 @@ let columns = new Map();
                     initialSortColumn='companyName' 
                     fetchMore={fetchData}
                     fetchPageCount = {fetchPageCount}
-                    onDataRecieved={extractData} 
+                    onDataRecieved={onDataRecieved} 
                     initState ={gridPageSettings}
-                    newItemCallback={addData}
+                    onNewRowCallback={addData}
                     isGridEditabe={true}/>            
         </div>
     )

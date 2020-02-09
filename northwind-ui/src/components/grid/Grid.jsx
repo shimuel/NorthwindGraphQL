@@ -18,13 +18,66 @@ import {
 import matchSorter from 'match-sorter'
 import { useQuery } from "@apollo/react-hooks";
 
-const Grid = ({
+const Styles = styled.div`
+  /* This is required to make the table full-width */
+    display: block;
+    max-width: 100%;
+
+    /* This will make the table scrollable when it gets too small */
+    .tableWrap {
+      display: block;
+      max-width: 100%;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      border-bottom: 1px solid black;
+    }
+
+    table {
+      /* Make sure the inner table is always as wide as needed */
+      width: 100%;
+      border-spacing: 0;
+
+      tr {
+        :last-child {
+          td {
+            border-bottom: 0;
+          }
+        }
+      }
+
+      th,
+      td {
+        margin: 0;
+        padding: 0.5rem;
+        /*border-bottom: 1px solid black;*/
+        /*border-right: 1px solid black;*/
+
+        /* The secret sauce */
+        /* Each cell should grow equally */
+        width: 1%;
+        /* But "collapsed" cells should be as small as possible */
+        &.collapse {
+          width: 0.0000000001%;
+        }
+
+        :last-child {
+          border-right: 0;
+        }
+      }
+    }
+
+    .pagination {
+      padding: 0.5rem;
+    }
+`
+  const Grid = ({
   isGridEditabe,
   columns,
   gridColsMetaData,
   data,
   initialState,
   loading,
+  fetchData,
   pageCount: controlledPageCount,
   filterTypes,  
   disablePageResetOnDataChange,
@@ -34,11 +87,10 @@ const Grid = ({
   newGridIdItem,
   setEditMode,
   deleteRow,
-  rollbackChanges
+  revertChanges,
+  onRowClick,
+  onCellClick
 }) => {
-
-  const [{ pageIndex, pageSize }] = initialState
-
   // Use the state and functions returned from useTable to build your UI
   const {
     getTableProps,
@@ -53,17 +105,19 @@ const Grid = ({
     nextPage,
     previousPage,
     setPageSize,
+    // Get the state from the instance
+    state: { pageIndex, pageSize, selectedRowIds },
   } = useTable(
     {
       columns,
       data,
-      state: initialState,
       defaultColumn, //// Let's set up our default Filter UI
       manualPagination: true, // Tell the usePagination
       // hook that we'll handle our own data fetching
       // This means we'll also have to provide our own
       // pageCount.
       filterTypes,
+      initialState:initialState,
       pageCount: controlledPageCount,
       disablePageResetOnDataChange,
       updateRow,
@@ -71,7 +125,9 @@ const Grid = ({
       newGridIdItem,      
       setEditMode,
       deleteRow,
-      rollbackChanges
+      revertChanges,
+      onRowClick,
+      onCellClick
     },
     useFilters,
     useSortBy,
@@ -79,26 +135,44 @@ const Grid = ({
     useRowSelect
   )
 
+
+  //A. Listen for changes in pagination and use the state to fetch our new data
+  React.useEffect(
+    () => {
+      fetchData({ pageIndex, pageSize })
+    },
+    [pageIndex, pageSize]
+  )
+
   const onSelectRow = (row) => {
-    return <Table.Row {...row.getRowProps()}>
+   
+    return <Table.Row { ...row.getRowProps( onRowClick ? {onClick: () =>{ 
+      const {editMode, ...noA } = row.original
+        onRowClick({...noA}, row.index)
+      }}:'')}>
       {row.cells.map((cell) => {        
-        //console.log(`EDIT_MODE ${EDIT_MODE} ${cell.row.original.editMode} ${cell.value}`)
-        //if (cell.column.id !== EDIT_MODE) {
+    
           const inEditState = cell.row.original.editMode === true 
           return (
-            <Table.Cell {...cell.getCellProps()} onClick={(e) => {                     
+            <Table.Cell {...cell.getCellProps()} onClick={(e) => {  
               const idx = cell.row.index
               const id = EDIT_MODE       
               e.preventDefault()                              
               if(!inEditState) {           
                 // console.log(`Going into edit mode..`)
-                updateRow(idx, 'editMode', true)                
+                updateRow(idx, 'editMode')                
+              }
+              if(onCellClick){
+                const {editMode, ...noA} = cell.row.original
+                noA.row = cell.row.index
+                noA.col = cell.column.index
+                onCellClick(noA)
               }
             }}>
               {                
                 !inEditState ? cell.render(() => {
 
-                  return <span>{cell.value}</span>
+                  return cell.value ? <span>{cell.value.toString()}</span> : <span>{cell.value}</span> 
                 }) : cell.render('Cell')
               }
             </Table.Cell>
@@ -115,7 +189,7 @@ const Grid = ({
   }
   const renderHeaderSortIndicators = (column) => {
       
-    if(!column.columns /*! the Group Header Column*/ ) {
+    if(column && !column.columns /*! the Group Header Column*/ ) {
       if(gridColsMetaData.get(column.id).isSortable === true ) {
         return <div {...column.getSortByToggleProps()}>
           <span>
@@ -134,78 +208,76 @@ const Grid = ({
 
   const renderHeaderAddRollbackButtons = (column, isGridEitable) => {
     /*the Group Header Column*/ 
-    if(column.columns ) {
+    if(column && column.columns ) {
         if(isGridEitable) {
-            return <div>                                        
-                    <Button floated='left' className='ui primary button' onClick={() => {                                                                 
-                          addRow()                                                    
-                      }                      
-                    }> Add</Button>   
+            return <div className='ui pagination left floated menu'>
+                    <Button className='ui primary button' onClick={() => {                                                                 
+                                addRow()                                                    
+                            }                      
+                          }> Add</Button>  
                     <Button floated='left' className='ui primary button' onClick={() => {  
-                          setEditMode(-1, EDIT_MODE)                                                      
-                          rollbackChanges()                             
-                      }                      
-                    }> Rollback</Button>     
-                    {column.render('Header') }                                         
-                  </div>
+                                //setEditMode(-1, EDIT_MODE)                                                      
+                                revertChanges()                             
+                            }                      
+                          }> Rollback</Button>     
+                  </div>                       
         }
         else
-        return column.render('Header')      
+          return column.render('Header')      
     } else return null
   }
 
-  const renderScrollingButtons = () => {
-      return <Menu floated='right' pagination>
-              <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}>
-                <Icon name='chevron left' />
-              </Menu.Item>
-              <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
-                <Icon name='chevron right' />
-              </Menu.Item>
-            </Menu>
+  const renderPagination = () =>{
+    return <Menu floated='right' pagination>
+      <Menu.Item as='a' icon onClick={() => previousPage()} disabled={!canPreviousPage}>
+        <Icon name='chevron left' />
+      </Menu.Item>
+      <Menu.Item as='a' icon onClick={() => nextPage()} disabled={!canNextPage}>
+        <Icon name='chevron right' />
+      </Menu.Item>
+    </Menu>
   }
   // Render the UI for your table
   return (
     <>
-      { /*<pre>
-        <code>{JSON.stringify(initialState, null, 2)}</code>
-      </pre> */}
-      <Table fixed celled selectable {...getTableProps()}>
-        <Table.Header>
-          {headerGroups.map(headerGroup => (
-            <Table.Row {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => {                
-                return <Table.HeaderCell {...column.getHeaderProps()} >
-                  {renderHeaderSortIndicators(column)}
-                  {renderHeaderAddRollbackButtons(column, isGridEditabe) }
-                  {column.columns ? renderScrollingButtons() : ''}
-                  <div>{renderHeaderFilters(column)}</div>
-                </Table.HeaderCell>
-              })}
+      <Styles>
+        <Table fixed celled selectable {...getTableProps()}>
+          <Table.Header>
+            {headerGroups.map(headerGroup => (
+              <Table.Row {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => {                
+                  return <Table.HeaderCell {...column.getHeaderProps()} >
+                    {column && column.columns ? renderHeaderAddRollbackButtons(column, isGridEditabe) :null }
+                    {column && column.columns ? renderPagination() :null }
+                    {renderHeaderSortIndicators(column)}                    
+                    <div>{renderHeaderFilters(column)}</div>
+                  </Table.HeaderCell>
+                })}
+              </Table.Row>
+            ))}
+          </Table.Header>
+          <Table.Body>
+            {page.map((row, i) => {
+              prepareRow(row)
+                return  onSelectRow(row)
+              }
+            )}
+            {loading ? (
+              // Use our custom loading state to show a loading indicator
+              <tr>
+                <td>Loading...</td>
+              </tr>
+            ) : null}
+          </Table.Body>
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell colSpan={gridColsMetaData.size}>
+              {renderPagination()}
+              </Table.HeaderCell>
             </Table.Row>
-          ))}
-        </Table.Header>
-        <Table.Body>
-          {page.map((row, i) => {
-             prepareRow(row)
-              return  onSelectRow(row)
-            }
-          )}
-          {loading ? (
-            // Use our custom loading state to show a loading indicator
-            <tr>
-              <td>Loading...</td>
-            </tr>
-          ) : null}
-        </Table.Body>
-        <Table.Footer>
-          <Table.Row>
-            <Table.HeaderCell colSpan={gridColsMetaData.size}>
-              {renderScrollingButtons()}
-            </Table.HeaderCell>
-          </Table.Row>
-        </Table.Footer>
-      </Table>
+          </Table.Footer>
+        </Table>
+      </Styles>
       {/* 
             Pagination can be built however you'd like. 
             This is just a very basic UI implementation:
@@ -231,14 +303,34 @@ const Grid = ({
           icon='world'
           options={[{ key: '3', text: '3', value: '3' }, { key: '5', text: '5', value: '5' }]}
           search
-          text={`Show ${pageSize}`}
-          value={pageSize}
-          onChange={(e, { name, value }) => setPageSize(Number(value))}
+          text={`Show ${initialState.pageSize}`}
+          value={initialState.pageSize}
+          onChange={(e, { name, value }) => { 
+            setPageSize(Number(value))}
+          }
         >
         </Dropdown>
       </div>
+      { <pre>
+        <code>
+          {JSON.stringify(
+            {
+              pageIndex,
+              pageSize,
+              pageCount,
+              canNextPage,
+              canPreviousPage,
+            },
+            null,
+            2
+          )}
+        </code>
+      </pre>}
     </>
+    
   )
+
+  
 } /*GRID CLASS ENDS */
 
 

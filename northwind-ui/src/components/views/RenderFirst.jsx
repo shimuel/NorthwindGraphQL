@@ -43,11 +43,8 @@ const FirstView = () => {
         show:true,
         type:"string"
     })
-    // companyName
-    //   contactName
-    // columns.set(EDIT_MODE,EDITMODE_METADATA())
 
-    const extractData = (previousData, nextData ) => {
+    const onDataRecieved = (previousData, nextData ) => {
       
         if(nextData){
 
@@ -76,46 +73,34 @@ const FirstView = () => {
         }
     }
       
-    const gridPageSettings = {pageSize: 3,pageIndex:1}
+    const gridState = {pageSize: 3,pageIndex:0}
 
     const ORDERS/*{ data, loading, error, fetchMore }*/ = useQuery(GET_CUSTOMERS_PAGE, {
-        variables: {size: gridPageSettings.pageSize,index:gridPageSettings.pageSize}
+        variables: {size: gridState.pageSize,index:gridState.pageSize}
     });
 
-    const [fetchQuery1, { loading1, data1 }] = useLazyQuery(GET_PRODUCT_LIST);
-    // const [fetchQuery2, { loading2, data2 }] = useLazyQuery(GET_REGION_LIST);
-
-    // useEffect(() => {
-    //   if (!GetStage.loading && GetStage.data.getGame.stage === "Created") {
-    //     fetchQuery1({variables: {
-    //      input: {
-    //         id: getId.id
-    //       }
-    //     }})
-    //   } else if (!GetStage.loading && GetStage.data.getGame.stage === "Confirmed") {
-    //     fetchQuery2({variables: {
-    //      input: {
-    //         id: getId.id
-    //       }
-    //     }})
-    //   } 
-    // }, [GetState.data, GetStage.loading])
-
-    const onRowSelect = (rowId, colId, data) => {
-      debugger
-      console.log('ssss');
+    
+    const onCellClick =  (cellInfo) => {
+      
+      if (cellInfo) {
+        console.log(`onCellClick....${JSON.stringify(cellInfo)}`)
+      }
+      return {};
+    }
+    const onRowClick =  (data, idx) => {
+      
+      if (data) {
+        console.log(`onRowClick....${JSON.stringify(data)} row - ${idx}`)
+      }
+      return {};
     }
 
     const fetchPageCount = (data) => {
         return data.customersPage.pageCount; 
     }
-    
-    const addData = () => {
-        //return{companyName:"test",orderDate:"", shipVia:""}    
-    }
 
     const fetchData = async  (p) =>{
-
+      console.log(`sa,mmmmm...fetchData...${JSON.stringify(p)}`)
         return ORDERS.fetchMore({
             variables: {index:p.pageIndex, size:p.pageSize},
             updateQuery: (previous, { fetchMoreResult }) => {                                    
@@ -144,9 +129,10 @@ const FirstView = () => {
                 initialSortColumn='companyName' 
                 fetchMore={fetchData}
                 fetchPageCount = {fetchPageCount}
-                onDataRecieved={extractData} 
-                initState ={gridPageSettings}
-                onRowSelect={onRowSelect}/>            
+                onDataRecieved={onDataRecieved} 
+                initState ={gridState}
+                rowClickCallback={onRowClick}
+                cellClickCallback={onCellClick}/>            
         </div>
     )
 

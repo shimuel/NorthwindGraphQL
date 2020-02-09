@@ -2,9 +2,6 @@ import React from 'react';
 import styled from "styled-components";
 // import {Container, Icon, Grid as semGrid, GridColumn} from 'semantic-ui-react'
 import "../../App.css"
-import {
-  useTableState
-} from 'react-table'
 import {Grid} from './Grid'  
 import {
   HiddenCell,
@@ -14,28 +11,17 @@ import {
   EditableListCell,
   EditableCheckboxCell,
   EDIT_MODE,
+  ACTION_SAVED,
+  ACTION_CANCELLED,
   EDITMODE_METADATA} from './GridExtn'
   
 
 const GridWrapper = (props) => {
 
-  const { gridHeader, gridCols, onDataRecieved, initState, fetchMore, fetchPageCount, queryParams, newItemCallback, onRowSelect } = props
+  const { gridHeader, gridCols, onDataRecieved, initState, fetchMore, fetchPageCount, queryParams, onNewRowCallback, cellClickCallBack, rowClickCallback } = props
   let { isGridEditabe } = props
-  const state = initState//{ pageSize: 3,pageIndex:0, sortBgridPageSettings.rowCount={data.ordersPage.totalLength}y: [{ id: 'companyName', asc: true }] }
 
-  //Setup State
-  const tableState = useTableState(state)
-  const [{ pageIndex, pageSize }] = tableState
-
-  //A. Listen for changes in pagination and use the state to fetch our new data
-  React.useEffect(
-    () => {
-      fetchData({ pageIndex, pageSize })
-    },
-    [pageIndex, pageSize]
-  )
-
-   isGridEditabe = isGridEditabe  || false
+  isGridEditabe = isGridEditabe  || false
   //Setup Grid Column metadata
   let cols = []
   gridCols.forEach((cObj) => {
@@ -117,6 +103,10 @@ const GridWrapper = (props) => {
     () => ({
       // Let's set up our default Filter UI
       Filter: DefaultColumnFilter,
+        // When using the useFlexLayout:
+        minWidth: 30, // minWidth is only used as a limit for resizing
+        width: 150, // width is used for both the flex-basis and flex-grow
+        maxWidth: 200, // maxWidth is only used as a limit for resizing
       // Cell: (row) => {
 
       //   //if (row.cell.id !== EDIT_MODE)
@@ -200,35 +190,57 @@ const GridWrapper = (props) => {
 
     // Let's add a data resetter/randomizer to help
   // illustrate that flow...
-  const rollbackChanges = () => {
-    setData(masterData)
+  const revertChanges = () => {
+    //setData(masterData)
+    if(masterData.length !== data.length)
+    {
+
+    }else{
+      
+    }
   }
 
   //Turn on edit mode for all cells in the row to be edited and turn off edit in other rows
-  const setEditMode = (rowIndex, columnID) => {
-
+  const setEditMode = (rowIndex, columnID, value) => {
+    
     setData(old =>
-      old.map((row, index) => {
-        
-        //console.log(`before...${JSON.stringify(row)}`)
-        let o = {
-          ...old[index],
-          [columnID]: index === rowIndex ? true:false,
-        }
-        //console.log(`before...${JSON.stringify(row)}`)
+      old.map((row, index) => {        
+        //console.log(`\nsetEditMode before...${JSON.stringify(old[index],)}`)
+        const  o = {
+            ...old[index],
+            [columnID]: index === rowIndex ? true: false
+          }
+        //console.log(`\nsetEditMode after...${JSON.stringify(o)}`)
         return o
       })
     );   
   }
 
-  const addRow = () => {              
-        //turn of other edits
-        skipPageResetRef.current = true
-        setEditMode(-1, EDIT_MODE)                        
-        setData(oldItems => [...oldItems, {...newItemCallback(), [EDIT_MODE]: true}]);   
+  const cancelEditMode = () => {
+    
+    setData(old =>
+      old.map((row, index) => {        
+        //console.log(`\nsetEditMode before...${JSON.stringify(old[index],)}`)
+        const  o = {
+            ...old[index],
+            [EDIT_MODE]: false
+          }
+        //console.log(`\nsetEditMode after...${JSON.stringify(o)}`)
+        return o
+      })
+    );   
   }
 
-  const deleteRow = (rowIndex) => {
+  const onAdd = () => {              
+        //turn of other edits
+        skipPageResetRef.current = true    
+        cancelEditMode()   
+        setData(oldItems => {
+          return [...oldItems, {...onNewRowCallback(), [EDIT_MODE]: true}]
+        });       
+  }
+
+  const onDelete = (rowIndex) => {
 
   }
 
@@ -240,22 +252,33 @@ const GridWrapper = (props) => {
   // When our cell renderer calls updateRow, we'll use
   // the rowIndex, columnID and new value to update the
   // original data with the new value
-  const updateRow = (rowIndex, columnID, value) => {
+  const onUpdate = (rowIndex, columnID, value) => {
     // We also turn on the flag to not reset the page
     //console.log(`${rowIndex} ${columnID} ${value}`)
-    
     skipPageResetRef.current = true
     
-    if(EDIT_MODE === columnID){      
-      setEditMode(rowIndex, columnID)
+    if(EDIT_MODE === columnID) {   
+      // console.log(`\nonUpdate....Going into EditMode..rowIdx ${rowIndex} columnID ${columnID} value ${JSON.stringify(value)}`)
+      if(value && (value === ACTION_SAVED || value === ACTION_CANCELLED )) {
+          cancelEditMode()
+          if(value === ACTION_SAVED)
+            console.log('saved !')    
+          else
+            console.log('cancelled !')        
+      } else {
+          setEditMode(rowIndex, columnID)
+      }
+
     } else {      
       setData(old =>
         old.map((row, index) => {
           if (index === rowIndex) {
+            // console.log(`\nonUpdate....before...${JSON.stringify(row)}`)
             let obj = {
               ...old[rowIndex],
               [columnID]: value,
             }
+            // console.log(`\nonUpdate....after...${JSON.stringify(row)}`)
             return obj
           }
           return row
@@ -285,20 +308,20 @@ const GridWrapper = (props) => {
       isGridEditabe={isGridEditabe}
       columns={gridColumns}
       gridColsMetaData={gridCols}
-      defaultColumn={defaultReadOnlyColumn}
+      defaultColumn={defaultReadOnlyColumn}onCellClick
       data={data}
-      initialState={tableState}
+      initialState={initState}
       fetchData={fetchData}
       loading={loading}
       pageCount={pageCount}
-      filterTypes={filterTypes}
-      updateRow={updateRow}
-      addRow={addRow}
-      onRowSelect={onRowSelect}
-      newGridIdItem={newItemCallback}
+      filterTypes={filterTypes}      
+      addRow={onAdd}
+      updateRow={onUpdate}
+      deleteRow={onDelete}
+      onRowClick={rowClickCallback}
+      onCellClick={cellClickCallBack}
       setEditMode={setEditMode}
-      deleteRow={deleteRow}
-      rollbackChanges={rollbackChanges}
+      revertChanges={revertChanges}
       disablePageResetOnDataChange={skipPageResetRef.current}
     />
   )
