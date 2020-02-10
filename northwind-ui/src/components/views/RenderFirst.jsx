@@ -4,7 +4,7 @@ import "../../App.css";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import  { GET_CUSTOMERS_PAGE, GET_PRODUCT_LIST, GET_REGION_LIST } from '../../graphql/queries'
 import  {GridWrapper} from '../grid/GridWrapper'
-import  {TestModal} from '../modals/testModal'
+import  {TestModal} from '../modals/TestModal'
 const FirstView = () => {
 
   const [open, setOpen] = React.useState(false)
