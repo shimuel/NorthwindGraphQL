@@ -1,10 +1,13 @@
 import React from "react";
+import { useState, useEffect, useMemo } from 'react';
 import "../../App.css";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import  { GET_CUSTOMERS_PAGE, GET_PRODUCT_LIST, GET_REGION_LIST } from '../../graphql/queries'
 import  {GridWrapper} from '../grid/GridWrapper'
-
+import  {TestModal} from '../modals/testModal'
 const FirstView = () => {
+
+  const [open, setOpen] = React.useState(false)
 
     let columns = new Map();
 
@@ -91,6 +94,12 @@ const FirstView = () => {
       
       if (data) {
         console.log(`onRowClick....${JSON.stringify(data)} row - ${idx}`)
+
+        if(idx === 1){
+          setOpen(true)
+        }else{
+          setOpen(false)
+        }
       }
       return {};
     }
@@ -117,12 +126,15 @@ const FirstView = () => {
 
     if (ORDERS.error) {
       console.log('error..')
-      return <div>Error! {ORDERS.error.message}</div>;
+      return <div>Error! {ORDERS.error.messaGridStylesge}</div>;
+    }
+    const renderChildModal = () => {
+      return open ? <TestModal show={open} onHide={() => setOpen(false)} /> : null 
     }
 
     return (
-        <div className="Home">    
-            <span>Test</span>       
+        <div className="Home"> 
+              {renderChildModal()}
             <GridWrapper       
                 gridHeader='Customers'             
                 gridCols={columns}
@@ -132,7 +144,7 @@ const FirstView = () => {
                 onDataRecieved={onDataRecieved} 
                 initState ={gridState}
                 rowClickCallback={onRowClick}
-                cellClickCallback={onCellClick}/>            
+                cellClickCallback={onCellClick}/>     
         </div>
     )
 
@@ -142,3 +154,4 @@ const FirstView = () => {
 export {
     FirstView
 }
+
