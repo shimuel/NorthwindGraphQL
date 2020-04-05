@@ -308,7 +308,7 @@ const GridWrapper = (props) => {
       isGridEditabe={isGridEditabe}
       columns={gridColumns}
       gridColsMetaData={gridCols}
-      defaultColumn={defaultReadOnlyColumn}onCellClick
+      defaultColumn={defaultReadOnlyColumn}
       data={data}
       initialState={initState}
       fetchData={fetchData}

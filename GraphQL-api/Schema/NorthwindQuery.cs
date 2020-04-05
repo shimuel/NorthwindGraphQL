@@ -247,7 +247,7 @@ namespace GraphQL_api.Schema
             //Product
             Field<ProductType>(
                 "Product",
-                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>>{ Name = "id" }),
+                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>>{ Name = "id" }),
                 resolve: context => {
                     var id = context.GetArgument<string>("id");
                      var tmp = uow.GetRepositoryAsync<Product>().SingleAsync(predicate: i=> i.ProductId.ToString() == id,
