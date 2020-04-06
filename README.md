@@ -3,3 +3,11 @@
 
 #docker build --pull -t graphql-api .
 #docker run --rm -it -p 5000:80 graphql-api
+#docker exec -it 01e03740af81  ls  - to run commands on container
+
+#docker container prune
+#docker container ls -aq
+#docker container stop $(docker container ls -aq) - To stop all running containers use the docker container stop
+#docker container rm $(docker container ls -aq) - 
+#docker image rm 75835a67d134 2a4cca5ac898
+#docker image ls
