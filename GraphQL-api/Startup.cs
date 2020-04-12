@@ -57,16 +57,23 @@ namespace GraphQL_api
             // use DI (http://docs.automapper.org/en/latest/Dependency-injection.html) or create the mapper yourself
             var mapper = configuration.CreateMapper();
             services.AddSingleton(mapper);
-            
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowSpecificOrigin",
-                    builder => builder.WithOrigins("http://localhost:3000","http://localhost:8080")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials() 
-                );
-            });
+
+                services.AddCors(o => o.AddPolicy("AllowSpecificOrigin", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                }));
+
+            // services.AddCors(options =>
+            // {
+            //     options.AddPolicy("AllowSpecificOrigin",
+            //         builder => builder.WithOrigins("http://localhost:3000","http://localhost:8080")
+            //         .AllowAnyMethod()
+            //         .AllowAnyHeader()
+            //         .AllowCredentials() 
+            //     );
+            // });
             
             //Begining of User
             services.AddDbContext<UserDBContext>(
