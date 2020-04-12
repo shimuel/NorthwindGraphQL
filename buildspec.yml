@@ -1,4 +1,3 @@
-version: 0.2
 phases: 
   install:
     commands:
@@ -28,3 +27,5 @@ phases:
       - printf '[{"name":"graphql-api","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
   artifacts:
     files: imagedefinitions.json
+
+version: 0.2
