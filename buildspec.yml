@@ -19,4 +19,8 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image..
       - docker push 316663644837.dkr.ecr.us-west-2.amazonaws.com/graphql-api:latest
+      - printf '[{"name":"container-graphql-api","imageUri":"316663644837.dkr.ecr.us-west-2.amazonaws.com/graphql-api:latest"}]' > imagedefinitions.json
+      - cat imagedefinitions.json
+artifacts:
+  files:imagedefinitions.json
 version: 0.1
