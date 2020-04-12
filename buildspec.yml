@@ -8,7 +8,7 @@ phases:
     commands: 
       - echo build started on `date`
       - echo building the Docker image...
-      -  docker build -t graphql-api .
+      - docker build -t graphql-api .
       - docker tag graphql-api graphql-api:latest   
   post_build: 
     commands: 
