@@ -79,7 +79,7 @@ namespace WebApi.Controllers
             catch(AppException ex)
             {
                 // return error message if there was an exception
-                return BadRequest(new { message = ex.Message, version = "1" });
+                return BadRequest(new { message = ex.Message, version = "It works !!!" });
             }
         }
 
