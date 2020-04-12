@@ -8,19 +8,15 @@ phases:
       - echo Logging in to AWS ECR...
       - aws --version
       - $(aws ecr get-login --no-include-email --region us-west-2)
-      - REPOSITORY_URI=316663644837.dkr.ecr.us-west-2.amazonaws.com/graphql-api
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build: 
     commands: 
       - echo build started on `date`
       - echo building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .  
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG   
+      - docker build -t graphql-api .
+      - docker tag graphql-api 316663644837.dkr.ecr.us-west-2.amazonaws.com/graphql-api:latest   
   post_build: 
     commands: 
       - echo Build completed on `date`
       - echo Pushing the Docker image..
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push 316663644837.dkr.ecr.us-west-2.amazonaws.com/graphql-api:latest
 version: 0.1
