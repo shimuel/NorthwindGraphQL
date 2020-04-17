@@ -24,3 +24,4 @@
 #cat imagedefinitions.json
 #artifacts:
 #files:imagedefinitions.json
+#test
